@@ -16,7 +16,7 @@ int main()
 	//...
 	Node n;
 	iCluige.iNode.initZero(&n);
-	iCluige.iNode.addChild(&iCluige.publicRoot2D, &n);
+	iCluige.iNode.addChild(iCluige.publicRoot2D, &n);
 
 	Node* pn;
 	for(int i=0; i<3; i++)
@@ -32,7 +32,7 @@ int main()
 	wprintf(L"my node name : %ls\n", pn01->name);
 
 	wprintf(L"\ntree : \n");
-	iCluige.iNode.printTreePretty(&iCluige.privateRoot2D);
+	iCluige.iNode.printTreePretty(iCluige.privateRoot2D);
 
 
     //game loop
@@ -55,7 +55,7 @@ int main()
 //	wprintf(L"%ls\n", l);
 
 	wprintf(L"Finishing...\n");
-    return cluigeFinish();
+    return cluigeFinish(); //TODO
 }
 
 
