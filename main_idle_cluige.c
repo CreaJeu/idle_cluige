@@ -5,8 +5,6 @@
 
 int main()
 {
-    //TODO mettre des const aux params dans ttes les struct
-
     //SetConsoleOutputCP(CP_UTF8);
 
     //init
@@ -15,7 +13,7 @@ int main()
 	//here hardcode or parse my scene from file
 	//...
 	Node* n = iCluige.iNode.newNode();
-	iCluige.iNode.setName(n, L"Idle Root");
+	iCluige.iNode.setName(n, "Idle Root");
 	iCluige.iNode.addChild(iCluige.publicRoot2D, n);
 
 	//don't allocate nodes on stack, see deleteNode()
@@ -43,14 +41,14 @@ int main()
 
 	Node* pn01 = iCluige.iNode.newNode();
 	iCluige.iNode.addChild(pn, pn01);
-	wprintf(L"my node name : %ls\n", pn01->name);
+	printf("my node name : %s\n", pn01->name);
 
-	wprintf(L"\ntree : \n");
+	printf("\ntree : \n");
 	iCluige.iNode.printTreePretty(iCluige.privateRoot2D);
 
 
-	iCluige.iNode.setName(n, L"Test Rename");
-	wprintf(L"\ntree after root renamed: \n");
+	iCluige.iNode.setName(n, "Test Rename");
+	printf("\ntree after root renamed: \n");
 	iCluige.iNode.printTreePretty(iCluige.privateRoot2D);
 
     //game loop
@@ -72,7 +70,7 @@ int main()
 ////	wprintf(l);
 //	wprintf(L"%ls\n", l);
 
-	wprintf(L"Finishing...\n");
+	printf("Finishing...\n");
     return cluigeFinish(); //TODO
 }
 
