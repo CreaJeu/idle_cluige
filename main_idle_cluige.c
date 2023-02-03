@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "cluige.h"
 
+//if need (for debug) of SetConsoleOutputCP(CP_UTF8);
 //#include <windows.h>
 
 int main()
