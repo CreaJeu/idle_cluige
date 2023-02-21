@@ -29,7 +29,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="../cluige/bin/Release/libcluige.a" />
+					<Add library="../cluige/bin/Release/libcluige.dll" />
 					<Add directory="../cluige/bin/Release" />
 				</Linker>
 			</Target>
@@ -40,6 +40,14 @@
 			<Add option="-DPDC_WIDE" />
 			<Add directory="../cluige" />
 		</Compiler>
+		<Unit filename="VaEtVient.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="VaEtVient.h" />
+		<Unit filename="VaEtVientPlayer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="VaEtVientPlayer.h" />
 		<Unit filename="main_idle_cluige.c">
 			<Option compilerVar="CC" />
 		</Unit>

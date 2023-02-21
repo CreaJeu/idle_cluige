@@ -1,5 +1,7 @@
 #include <stdio.h>
-#include "cluige.h"
+#include <cluige.h>
+#include "VaEtVient.h"
+#include "VaEtVientPlayer.h"
 
 //if need (for debug) of SetConsoleOutputCP(CP_UTF8);
 //#include <windows.h>
@@ -10,6 +12,8 @@ int main()
 
     //init
 	cluigeInit();//makes all roots, set all functions pointers, etc.
+
+	#ifdef NOT_IN_GAME_JAM
 
 	//here hardcode or parse my scene from file
 	//...
@@ -51,6 +55,66 @@ int main()
 	iCluige.iNode.setName(n, "Test Rename");
 	printf("\ntree after root renamed: \n");
 	iCluige.iNode.printTreePretty(iCluige.privateRoot2D);
+
+
+#else
+	//game jam 2023_02_04
+	Node2D* testUberRootNode2D = iCluige.iNode2D.newNode2D();
+	Node* myTestUberRootNode = testUberRootNode2D->_thisNode;
+	iCluige.iNode.setName(myTestUberRootNode, "test uber root");
+	iCluige.iNode2D.moveLocal(testUberRootNode2D, (Vector2){36., 40.});
+	iCluige.iNode.addChild(iCluige.publicRoot2D, myTestUberRootNode);
+
+	Node2D* myRootNode2D = iCluige.iNode2D.newNode2D();
+	Node* myRootNode = myRootNode2D->_thisNode;
+	iCluige.iNode.setName(myRootNode, "Game");
+	iCluige.iNode2D.moveLocal(myRootNode2D, (Vector2){10., 25.});
+	iCluige.iNode.addChild(/*iCluige.publicRoot2D*/myTestUberRootNode, myRootNode);
+
+	SpriteText* groundSpriteText = iCluige.iSpriteText.newSpriteText();
+	Node* groundNode = groundSpriteText->_thisNode2D->_thisNode;
+	iCluige.iNode.setName(groundNode, "Ground");
+	iCluige.iNode2D.moveLocal(groundSpriteText->_thisNode2D, (Vector2){0, 1});//11.5});//-8.5});//
+	iCluige.iNode.addChild(myRootNode, groundNode);
+	iCluige.iSpriteText.setText(groundSpriteText, "=================================================");
+
+
+	SpriteText* blockSpriteText = iCluige.iSpriteText.newSpriteText();
+	Node* blockNode = blockSpriteText->_thisNode2D->_thisNode;
+	iCluige.iNode.setName(blockNode, "Block");
+	blockSpriteText->offset = (Vector2){2, 1.5};//origin at center
+	iCluige.iNode2D.moveLocal(blockSpriteText->_thisNode2D, (Vector2){0., -2.5});//
+	iCluige.iNode.addChild(myRootNode, blockNode);
+
+	struct VaEtVient* blockScript = newVaEtVient(blockNode);
+	blockScript->ownerSprite = blockSpriteText;
+
+
+	SpriteText* playerSpriteText = iCluige.iSpriteText.newSpriteText();
+	Node* playerNode = playerSpriteText->_thisNode2D->_thisNode;
+	iCluige.iNode.setName(playerNode, "Player");
+	iCluige.iNode.addChild(myRootNode, playerNode);
+	iCluige.iSpriteText.setText(playerSpriteText, " o\n'U`\n \"   ");
+	playerSpriteText->offset = (Vector2){1, 2};//origin at feet of player
+	iCluige.iNode2D.moveLocal(playerSpriteText->_thisNode2D, (Vector2){25., 0.});
+	struct VaEtVientPlayer* playerScript = newVaEtVientPlayer(playerNode);
+	playerScript->ownerSprite = playerSpriteText;
+/*
+
+ o        #####
+'U`       #   #
+ "        #   #
+          #####
+
+ */
+
+	//iCluige.wantedFrameSeconds = .1;
+	//iCluige.clock->scale = .6;
+	//iCluige.iNode.printTreePretty(iCluige.privateRoot2D);
+#endif // NOT_IN_GAME_JAM
+
+
+
 
     //game loop
 	cluigeRun();
