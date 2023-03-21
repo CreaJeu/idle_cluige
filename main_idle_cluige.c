@@ -13,7 +13,11 @@ int main()
     //init
 	cluigeInit();//makes all roots, set all functions pointers, etc.
 
-	#ifdef NOT_IN_GAME_JAM
+	//Variant varb = iCluige.iVariant.fromVal(VT_BOOL, true);
+	//Variant vard = iCluige.iVariant.fromVal(VT_DOUBLE, 3.14);
+	//Variant v;
+
+	#ifndef NOT_IN_GAME_JAM
 
 	//here hardcode or parse my scene from file
 	//...
@@ -56,6 +60,38 @@ int main()
 	printf("\ntree after root renamed: \n");
 	iCluige.iNode.printTreePretty(iCluige.privateRoot2D);
 
+	//test Deque
+	Deque dqTest;
+	iCluige.iDeque.dequeAlloc(&dqTest, VT_DOUBLE, 9);
+	iCluige.iDeque.push_back(&dqTest, 3.3);
+	iCluige.iDeque.push_back(&dqTest, 4.4);
+	iCluige.iDeque.push_back(&dqTest, 5.5);
+	iCluige.iDeque.push_front(&dqTest, 1.1);
+	iCluige.iDeque.push_front(&dqTest, 0.0);
+	iCluige.iDeque.insert(&dqTest, 2, 2.2);
+	iCluige.iDeque.append(&dqTest, 7.7);
+	iCluige.iDeque.insert(&dqTest, 6, 6.6);
+
+//	Variant vLast = iCluige.iDeque.pop_back(&dqTest);
+//	Variant vFirst = iCluige.iDeque.pop_front(&dqTest);
+//    iCluige.iDeque.remove(&dqTest, 7);
+//    iCluige.iDeque.remove(&dqTest, 4);
+//    iCluige.iDeque.remove(&dqTest, 0);
+//    iCluige.iDeque.clear(&dqTest);
+
+	StringBuilder sb_dq;
+	int sizeDequeMsg = iCluige.iDeque.size(&dqTest) * 9;//quick & dirty test
+	char* dqMsg = iCluige.iStringBuilder.stringAlloc(&sb_dq, sizeDequeMsg);
+	//dqMsg[0] = 'u';dqMsg[1] = 0;
+	iCluige.iStringBuilder.append(&sb_dq, "[ ");
+	for(int iDq=0; iDq < iCluige.iDeque.size(&dqTest); iDq++)
+    {
+        double val = iCluige.iDeque.at(&dqTest, iDq).d;
+        iCluige.iStringBuilder.append(&sb_dq, "%.1f ", val);
+    }
+    iCluige.iStringBuilder.append(&sb_dq, "]");
+	iCluige.iDeque.deleteDeque(&dqTest);
+	free(dqMsg);
 
 #else
 	//game jam 2023_02_04
