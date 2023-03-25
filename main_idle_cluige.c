@@ -6,6 +6,77 @@
 //if need (for debug) of SetConsoleOutputCP(CP_UTF8);
 //#include <windows.h>
 
+
+#ifndef NOT_IN_CREAJAM3
+int RIGHT_ACTION;
+int LEFT_ACTION;
+int QUIT_ACTION;
+
+struct _Player
+{
+    SpriteText* ownerSprite;
+	Script* thisScript;
+};
+typedef struct _Player Player;
+
+void deletePlayer(Script* thisScript)
+{
+    //maybe one day
+}
+
+static void process_Player(Script* thisScript, float elapsedSeconds)
+{
+    Player* thisPlayer =
+        (Player*)(thisScript->_subClass);
+    Node2D* thisNode2D = thisPlayer->ownerSprite->_thisNode2D;
+
+    static float accelY = 36.;
+    static float speedY = 0.;
+
+    speedY += accelY * elapsedSeconds;
+    float deplY = speedY * elapsedSeconds;
+    if(thisNode2D->position.y + deplY > -1)
+    {
+        bool jump = iCluige.iInput.is_action_just_pressed(
+                iCluige.input, RIGHT_ACTION);
+        if(jump)
+        {
+            speedY = -25.;//jump impulse
+        }
+        else
+        {
+            speedY = 0;
+        }
+            iCluige.iNode2D.setLocalPosition(thisNode2D,
+                (Vector2) { thisNode2D->position.x, -1. });
+    }
+    else
+    {
+        iCluige.iNode2D.moveLocal(thisNode2D, (Vector2) { 0., deplY });
+    }
+//    if(getch() == ' ')
+//    {
+//    }
+}
+
+Player* newPlayer(Node* thisNode)
+{
+    Script* newScript = iCluige.iScript.newScript(thisNode);
+    Player* newPlayer = iCluige.checkedMalloc(sizeof(Player));
+
+    newPlayer->thisScript = newScript;
+
+    newScript->node = thisNode;
+    newScript->deleteScript = deletePlayer;
+    newScript->process = process_Player;
+    newScript->_subClass = newPlayer;
+
+    thisNode->script = newScript;
+
+    return newPlayer;
+}
+#endif // NOT_IN_CREAJAM3
+
 int main()
 {
     //SetConsoleOutputCP(CP_UTF8);
@@ -13,11 +84,7 @@ int main()
     //init
 	cluigeInit();//makes all roots, set all functions pointers, etc.
 
-	//Variant varb = iCluige.iVariant.fromVal(VT_BOOL, true);
-	//Variant vard = iCluige.iVariant.fromVal(VT_DOUBLE, 3.14);
-	//Variant v;
-
-	#ifndef NOT_IN_GAME_JAM
+	#ifdef NOT_IN_GAME_JAM
 
 	//here hardcode or parse my scene from file
 	//...
@@ -94,6 +161,114 @@ int main()
 	free(dqMsg);
 
 #else
+	//game jam 2023_03_24
+	StringBuilder sb_gj3;
+	char* actionRightName = iCluige.iStringBuilder.stringAlloc(&sb_gj3, 5);
+	iCluige.iStringBuilder.append(&sb_gj3, "right");
+	RIGHT_ACTION = iCluige.iInput.add_action(
+            iCluige.input, actionRightName);
+	char* actionLeftName = iCluige.iStringBuilder.stringAlloc(&sb_gj3, 5);
+	iCluige.iStringBuilder.append(&sb_gj3, "left");
+	LEFT_ACTION = iCluige.iInput.add_action(
+            iCluige.input, actionLeftName);
+	char* actionQuitName = iCluige.iStringBuilder.stringAlloc(&sb_gj3, 5);
+	iCluige.iStringBuilder.append(&sb_gj3, "quit");
+	QUIT_ACTION = iCluige.iInput.add_action(
+            iCluige.input, actionQuitName);
+
+    iCluige.iInput.bind_key(iCluige.input, RIGHT_ACTION, 'd');
+    iCluige.iInput.bind_key(iCluige.input, RIGHT_ACTION, 'D');
+    iCluige.iInput.bind_key(iCluige.input, LEFT_ACTION, 'q');
+    iCluige.iInput.bind_key(iCluige.input, LEFT_ACTION, 'Q');
+    iCluige.iInput.bind_key(iCluige.input, QUIT_ACTION, 'x');
+    iCluige.iInput.bind_key(iCluige.input, QUIT_ACTION, 'X');
+
+	Node2D* gameRootNode2D = iCluige.iNode2D.newNode2D();
+	Node* gameRootRootNode = gameRootNode2D->_thisNode;
+	iCluige.iNode.setName(gameRootRootNode, "Game");
+	iCluige.iNode2D.moveLocal(gameRootNode2D, (Vector2){36., 30.});
+	iCluige.iNode.addChild(iCluige.publicRoot2D, gameRootRootNode);
+
+	SpriteText* playerSpriteText = iCluige.iSpriteText.newSpriteText();
+	Node* playerNode = playerSpriteText->_thisNode2D->_thisNode;
+	iCluige.iNode.setName(playerNode, "Player");
+	iCluige.iNode.addChild(gameRootRootNode, playerNode);
+	iCluige.iSpriteText.setText(playerSpriteText, " o\n'U`\n \"   ");
+	playerSpriteText->offset = (Vector2){1, 2};//origin at feet of player
+//	iCluige.iNode2D.moveLocal(playerSpriteText->_thisNode2D, (Vector2){25., 0.});
+	Player* playerScript = newPlayer(playerNode);
+	playerScript->ownerSprite = playerSpriteText;
+
+#endif // NOT_IN_GAME_JAM
+
+
+
+
+    //game loop
+	cluigeRun();
+
+//	wchar_t* t = L"└  ├";//;L"azerty";//// u"\u251c";//iCluige.checkedMalloc(88 * sizeof(wchar_t));
+//	wchar_t* l = L"";//      ░░░░▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓███";//;L"poiuytreza";////u"\u2514";//iCluige.checkedMalloc(88 * sizeof(wchar_t));
+////  ├  └
+////	wchar_t t[88];
+////	wchar_t l[88];
+////	wscanf("%ls", t);
+////	wscanf("%ls", l);
+////	t[1] = 0;
+////	t[0] = 0x251c;
+////	l[1] = 0;
+////	l[0] = 0x2514;
+////	wprintf(t);
+//	wprintf(L"%ls\n", t);
+////	wprintf(l);
+//	wprintf(L"%ls\n", l);
+
+	printf("Finishing...\n");
+    return cluigeFinish(); //TODO
+}
+
+
+/*  old tests
+
+	float* pf = iCluige.checkedMalloc(sizeof(float));
+	(*pf) = 3.141592;
+	wprintf(L"test iCluige.checkedMalloc : %f\n", (*pf));
+
+
+
+//	Variant varb = iCluige.iVariant.fromVal(VT_BOOL, true);
+//	Variant varc = iCluige.iVariant.fromVal(VT_CHAR, 'k');
+//	Variant vari32 = iCluige.iVariant.fromVal(VT_INT32, -49);
+//	Variant varui32 = iCluige.iVariant.fromVal(VT_UINT32, 3);
+//	Variant vari64 = iCluige.iVariant.fromVal(VT_INT64, -5000000000);
+//	Variant varui64 = iCluige.iVariant.fromVal(VT_UINT64, 5000000000);
+//	Variant varf = iCluige.iVariant.fromVal(VT_FLOAT, -49.3);
+//	Variant vard = iCluige.iVariant.fromVal(VT_DOUBLE, 3.14);
+//	Variant varptr = iCluige.iVariant.fromVal(VT_POINTER, &vard);
+//	Variant* vv = (Variant*)(varptr.ptr);
+//
+//	Variant vaarb = iCluige.iVariant.fromVal(VT_BOOL, false);
+//	Variant vaarc = iCluige.iVariant.fromVal(VT_CHAR, 'm');
+//	Variant vaari32 = iCluige.iVariant.fromVal(VT_INT32, -4);
+//	Variant vaarui32 = iCluige.iVariant.fromVal(VT_UINT32, 1);
+//	Variant vaari64 = iCluige.iVariant.fromVal(VT_INT64, -5000000001);
+//	Variant vaarui64 = iCluige.iVariant.fromVal(VT_UINT64, 5000000001);
+//	Variant vaarf = iCluige.iVariant.fromVal(VT_FLOAT, -19.1);
+//	Variant vaard = iCluige.iVariant.fromVal(VT_DOUBLE, 3.04);
+//	Variant vaarptr = iCluige.iVariant.fromVal(VT_POINTER, &vaard);
+//	int comp = iCluige.iVariant.compare(VT_BOOL, varb, vaarb);
+//	comp = iCluige.iVariant.compare(VT_CHAR, varc, vaarc);
+//	comp = iCluige.iVariant.compare(VT_INT32, vari32, vaari32);
+//	comp = iCluige.iVariant.compare(VT_UINT32, varui32, vaarui32);
+//	comp = iCluige.iVariant.compare(VT_INT64, vari64, vaari64);
+//	comp = iCluige.iVariant.compare(VT_UINT64, varui64, vaarui64);
+//	comp = iCluige.iVariant.compare(VT_FLOAT, varf, vaarf);
+//	comp = iCluige.iVariant.compare(VT_DOUBLE, vard, vaard);
+//	comp = iCluige.iVariant.compare(VT_POINTER, varptr, vaarptr);
+*/
+
+#ifdef IN_GAME_JAM_CREAJAM1
+
 	//game jam 2023_02_04
 	Node2D* testUberRootNode2D = iCluige.iNode2D.newNode2D();
 	Node* myTestUberRootNode = testUberRootNode2D->_thisNode;
@@ -147,40 +322,5 @@ int main()
 	//iCluige.wantedFrameSeconds = .1;
 	//iCluige.clock->scale = .6;
 	//iCluige.iNode.printTreePretty(iCluige.privateRoot2D);
-#endif // NOT_IN_GAME_JAM
 
-
-
-
-    //game loop
-	cluigeRun();
-
-//	wchar_t* t = L"└  ├";//;L"azerty";//// u"\u251c";//iCluige.checkedMalloc(88 * sizeof(wchar_t));
-//	wchar_t* l = L"";//      ░░░░▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓███";//;L"poiuytreza";////u"\u2514";//iCluige.checkedMalloc(88 * sizeof(wchar_t));
-////  ├  └
-////	wchar_t t[88];
-////	wchar_t l[88];
-////	wscanf("%ls", t);
-////	wscanf("%ls", l);
-////	t[1] = 0;
-////	t[0] = 0x251c;
-////	l[1] = 0;
-////	l[0] = 0x2514;
-////	wprintf(t);
-//	wprintf(L"%ls\n", t);
-////	wprintf(l);
-//	wprintf(L"%ls\n", l);
-
-	printf("Finishing...\n");
-    return cluigeFinish(); //TODO
-}
-
-
-/*  old tests
-
-	float* pf = iCluige.checkedMalloc(sizeof(float));
-	(*pf) = 3.141592;
-	wprintf(L"test iCluige.checkedMalloc : %f\n", (*pf));
-
-
-*/
+#endif // IN_GAME_JAM_CREAJAM1
