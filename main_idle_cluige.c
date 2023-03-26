@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <cluige.h>
+#include <float.h>
 #include "VaEtVient.h"
 #include "VaEtVientPlayer.h"
 
@@ -10,12 +11,17 @@
 #ifndef NOT_IN_CREAJAM3
 int RIGHT_ACTION;
 int LEFT_ACTION;
+int UP_ACTION;
+int DOWN_ACTION;
+int START_ACTION;
 int QUIT_ACTION;
 
 struct _Player
 {
     SpriteText* ownerSprite;
 	Script* thisScript;
+	Vector2 speed;
+	bool started;
 };
 typedef struct _Player Player;
 
@@ -29,34 +35,64 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
     Player* thisPlayer =
         (Player*)(thisScript->_subClass);
     Node2D* thisNode2D = thisPlayer->ownerSprite->_thisNode2D;
+    struct _Input* ii = iCluige.input;
+    struct iiInput* iii = &iCluige.iInput;
+    float weight = 2000;
+    float impulseStrength = 4;
 
-    static float accelY = 36.;
-    static float speedY = 0.;
+    if(iii->is_action_just_pressed(ii, QUIT_ACTION))
+    {
+        iCluige.quitAsked = true;
+        return;
+    }
+    if(!(thisPlayer->started))
+    {
+        if(iii->is_action_just_pressed(ii, START_ACTION))//' '
+        {
+            thisPlayer->started = true;
+            thisPlayer->speed = (Vector2){impulseStrength * 2, 0};
+        }
+        return;
+    }
 
-    speedY += accelY * elapsedSeconds;
-    float deplY = speedY * elapsedSeconds;
-    if(thisNode2D->position.y + deplY > -1)
+    Vector2 gravity, impulse, dSpeed, dPos;
+    Vector2* pos = &(thisNode2D->position);
+    //planet center (hence gravity) is centered on local (0,0)
+    gravity = *pos;
+    float h = iCluige.iVector2.length(pos);
+    // 1/h => normalize, 1/h² => gravity, 1/h^3.3 => fun
+    if(h > 10 * FLT_EPSILON)
     {
-        bool jump = iCluige.iInput.is_action_just_pressed(
-                iCluige.input, RIGHT_ACTION);
-        if(jump)
-        {
-            speedY = -25.;//jump impulse
-        }
-        else
-        {
-            speedY = 0;
-        }
-            iCluige.iNode2D.setLocalPosition(thisNode2D,
-                (Vector2) { thisNode2D->position.x, -1. });
+        iCluige.iVector2.kMul(&gravity, -weight/powf(h,3.3), &gravity);
     }
-    else
+
+    iCluige.iVector2.set(&impulse, 0, 0);
+    if(iii->is_action_just_pressed(ii, UP_ACTION))
     {
-        iCluige.iNode2D.moveLocal(thisNode2D, (Vector2) { 0., deplY });
+        impulse.y -= impulseStrength;
     }
-//    if(getch() == ' ')
-//    {
-//    }
+    if(iii->is_action_just_pressed(ii, DOWN_ACTION))
+    {
+        impulse.y += impulseStrength;
+    }
+    if(iii->is_action_just_pressed(ii, LEFT_ACTION))
+    {
+        impulse.x -= impulseStrength;
+    }
+    if(iii->is_action_just_pressed(ii, RIGHT_ACTION))
+    {
+        impulse.x += impulseStrength;
+    }
+
+    iCluige.iVector2.kMul(&gravity, elapsedSeconds, &dSpeed);
+    iCluige.iVector2.add(&(thisPlayer->speed), &dSpeed, &(thisPlayer->speed));
+    iCluige.iVector2.add(&(thisPlayer->speed), &impulse, &(thisPlayer->speed));
+
+    iCluige.iVector2.set(&dPos, 0, 0);
+    iCluige.iVector2.kMul(&thisPlayer->speed, elapsedSeconds, &dPos);
+
+    iCluige.iNode2D.moveLocal(thisNode2D, dPos);
+
 }
 
 Player* newPlayer(Node* thisNode)
@@ -65,6 +101,8 @@ Player* newPlayer(Node* thisNode)
     Player* newPlayer = iCluige.checkedMalloc(sizeof(Player));
 
     newPlayer->thisScript = newScript;
+    newPlayer->started = false;
+    newPlayer->speed = (Vector2){0, 0};
 
     newScript->node = thisNode;
     newScript->deleteScript = deletePlayer;
@@ -72,6 +110,11 @@ Player* newPlayer(Node* thisNode)
     newScript->_subClass = newPlayer;
 
     thisNode->script = newScript;
+
+    Node2D* thisNode2D = (Node2D*)(thisNode->_subClass);
+    SpriteText* thisSpriteText = (SpriteText*)(thisNode2D->_subClass);
+	newPlayer->ownerSprite = thisSpriteText;
+	iCluige.iNode2D.setLocalPosition(thisNode2D, (Vector2){-10,-20});
 
     return newPlayer;
 }
@@ -163,41 +206,64 @@ int main()
 #else
 	//game jam 2023_03_24
 	StringBuilder sb_gj3;
-	char* actionRightName = iCluige.iStringBuilder.stringAlloc(&sb_gj3, 5);
-	iCluige.iStringBuilder.append(&sb_gj3, "right");
-	RIGHT_ACTION = iCluige.iInput.add_action(
-            iCluige.input, actionRightName);
+	char* actionUpName = iCluige.iStringBuilder.stringAlloc(&sb_gj3, 5);
+	iCluige.iStringBuilder.append(&sb_gj3, "up");
+	UP_ACTION = iCluige.iInput.add_action(
+            iCluige.input, actionUpName);
+	char* actionDownName = iCluige.iStringBuilder.stringAlloc(&sb_gj3, 5);
+	iCluige.iStringBuilder.append(&sb_gj3, "down");
+	DOWN_ACTION = iCluige.iInput.add_action(
+            iCluige.input, actionDownName);
 	char* actionLeftName = iCluige.iStringBuilder.stringAlloc(&sb_gj3, 5);
 	iCluige.iStringBuilder.append(&sb_gj3, "left");
 	LEFT_ACTION = iCluige.iInput.add_action(
             iCluige.input, actionLeftName);
+	char* actionRightName = iCluige.iStringBuilder.stringAlloc(&sb_gj3, 5);
+	iCluige.iStringBuilder.append(&sb_gj3, "right");
+	RIGHT_ACTION = iCluige.iInput.add_action(
+            iCluige.input, actionRightName);
+	char* actionStartName = iCluige.iStringBuilder.stringAlloc(&sb_gj3, 5);
+	iCluige.iStringBuilder.append(&sb_gj3, "start");
+	START_ACTION = iCluige.iInput.add_action(
+            iCluige.input, actionStartName);
 	char* actionQuitName = iCluige.iStringBuilder.stringAlloc(&sb_gj3, 5);
 	iCluige.iStringBuilder.append(&sb_gj3, "quit");
 	QUIT_ACTION = iCluige.iInput.add_action(
             iCluige.input, actionQuitName);
 
+    iCluige.iInput.bind_key(iCluige.input, UP_ACTION, 'z');
+    iCluige.iInput.bind_key(iCluige.input, UP_ACTION, 'Z');
+    iCluige.iInput.bind_key(iCluige.input, DOWN_ACTION, 's');
+    iCluige.iInput.bind_key(iCluige.input, DOWN_ACTION, 'S');
     iCluige.iInput.bind_key(iCluige.input, RIGHT_ACTION, 'd');
     iCluige.iInput.bind_key(iCluige.input, RIGHT_ACTION, 'D');
     iCluige.iInput.bind_key(iCluige.input, LEFT_ACTION, 'q');
     iCluige.iInput.bind_key(iCluige.input, LEFT_ACTION, 'Q');
+    iCluige.iInput.bind_key(iCluige.input, START_ACTION, ' ');
     iCluige.iInput.bind_key(iCluige.input, QUIT_ACTION, 'x');
     iCluige.iInput.bind_key(iCluige.input, QUIT_ACTION, 'X');
 
 	Node2D* gameRootNode2D = iCluige.iNode2D.newNode2D();
 	Node* gameRootRootNode = gameRootNode2D->_thisNode;
 	iCluige.iNode.setName(gameRootRootNode, "Game");
-	iCluige.iNode2D.moveLocal(gameRootNode2D, (Vector2){36., 30.});
+	iCluige.iNode2D.moveLocal(gameRootNode2D, (Vector2){50., 35.});
 	iCluige.iNode.addChild(iCluige.publicRoot2D, gameRootRootNode);
+
+	SpriteText* planetSpriteText = iCluige.iSpriteText.newSpriteText();
+	Node* planetNode = planetSpriteText->_thisNode2D->_thisNode;
+	iCluige.iNode.setName(planetNode, "Planet");
+	iCluige.iSpriteText.setText(planetSpriteText, "O");
+//	iCluige.iNode2D.moveLocal(planetSpriteText->_thisNode2D, (Vector2){1, 1.});
+	iCluige.iNode.addChild(gameRootRootNode, planetNode);
 
 	SpriteText* playerSpriteText = iCluige.iSpriteText.newSpriteText();
 	Node* playerNode = playerSpriteText->_thisNode2D->_thisNode;
 	iCluige.iNode.setName(playerNode, "Player");
 	iCluige.iNode.addChild(gameRootRootNode, playerNode);
-	iCluige.iSpriteText.setText(playerSpriteText, " o\n'U`\n \"   ");
-	playerSpriteText->offset = (Vector2){1, 2};//origin at feet of player
-//	iCluige.iNode2D.moveLocal(playerSpriteText->_thisNode2D, (Vector2){25., 0.});
-	Player* playerScript = newPlayer(playerNode);
-	playerScript->ownerSprite = playerSpriteText;
+	iCluige.iSpriteText.setText(playerSpriteText, "#");
+//	playerSpriteText->offset = (Vector2){1, 2};//origin at feet of player
+//	iCluige.iNode2D.moveLocal(playerSpriteText->_thisNode2D, (Vector2){-1., -1.});
+	/*Player* playerScript =*/ newPlayer(playerNode);
 
 #endif // NOT_IN_GAME_JAM
 
