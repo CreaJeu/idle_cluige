@@ -9,6 +9,9 @@
 
 
 #ifndef NOT_IN_CREAJAM3
+#include <../PDCurses/curses.h>
+#include <math.h>
+
 int RIGHT_ACTION;
 int LEFT_ACTION;
 int UP_ACTION;
@@ -30,6 +33,7 @@ void deletePlayer(Script* thisScript)
     //maybe one day
 }
 
+SpriteText* hudSpriteText;
 static void process_Player(Script* thisScript, float elapsedSeconds)
 {
     Player* thisPlayer =
@@ -37,7 +41,7 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
     Node2D* thisNode2D = thisPlayer->ownerSprite->_thisNode2D;
     struct _Input* ii = iCluige.input;
     struct iiInput* iii = &iCluige.iInput;
-    float weight = 2000;
+    float weight = 2500;
     float impulseStrength = 4;
 
     if(iii->is_action_just_pressed(ii, QUIT_ACTION))
@@ -49,6 +53,7 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
     {
         if(iii->is_action_just_pressed(ii, START_ACTION))//' '
         {
+            iCluige.iNode2D.moveLocal(hudSpriteText->_thisNode2D, (Vector2){-5, -8});
             thisPlayer->started = true;
             thisPlayer->speed = (Vector2){impulseStrength * 2, 0};
         }
@@ -60,10 +65,10 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
     //planet center (hence gravity) is centered on local (0,0)
     gravity = *pos;
     float h = iCluige.iVector2.length(pos);
-    // 1/h => normalize, 1/h² => gravity, 1/h^3.3 => fun
+    // 1/h => normalize, 1/h² => gravity, 1/h^3.2 => fun
     if(h > 10 * FLT_EPSILON)
     {
-        iCluige.iVector2.kMul(&gravity, -weight/powf(h,3.3), &gravity);
+        iCluige.iVector2.kMul(&gravity, -weight/powf(h,3.2), &gravity);
     }
 
     iCluige.iVector2.set(&impulse, 0, 0);
@@ -118,6 +123,7 @@ Player* newPlayer(Node* thisNode)
 
     return newPlayer;
 }
+
 #endif // NOT_IN_CREAJAM3
 
 int main()
@@ -231,14 +237,18 @@ int main()
 	QUIT_ACTION = iCluige.iInput.add_action(
             iCluige.input, actionQuitName);
 
-    iCluige.iInput.bind_key(iCluige.input, UP_ACTION, 'z');
-    iCluige.iInput.bind_key(iCluige.input, UP_ACTION, 'Z');
-    iCluige.iInput.bind_key(iCluige.input, DOWN_ACTION, 's');
-    iCluige.iInput.bind_key(iCluige.input, DOWN_ACTION, 'S');
-    iCluige.iInput.bind_key(iCluige.input, RIGHT_ACTION, 'd');
-    iCluige.iInput.bind_key(iCluige.input, RIGHT_ACTION, 'D');
-    iCluige.iInput.bind_key(iCluige.input, LEFT_ACTION, 'q');
-    iCluige.iInput.bind_key(iCluige.input, LEFT_ACTION, 'Q');
+    iCluige.iInput.bind_key(iCluige.input, UP_ACTION, 'e');
+    iCluige.iInput.bind_key(iCluige.input, UP_ACTION, 'E');
+    iCluige.iInput.bind_key(iCluige.input, UP_ACTION, KEY_UP);
+    iCluige.iInput.bind_key(iCluige.input, DOWN_ACTION, 'd');
+    iCluige.iInput.bind_key(iCluige.input, DOWN_ACTION, 'D');
+    iCluige.iInput.bind_key(iCluige.input, DOWN_ACTION, KEY_DOWN);
+    iCluige.iInput.bind_key(iCluige.input, RIGHT_ACTION, 'f');
+    iCluige.iInput.bind_key(iCluige.input, RIGHT_ACTION, 'F');
+    iCluige.iInput.bind_key(iCluige.input, RIGHT_ACTION, KEY_RIGHT);
+    iCluige.iInput.bind_key(iCluige.input, LEFT_ACTION, 's');
+    iCluige.iInput.bind_key(iCluige.input, LEFT_ACTION, 'S');
+    iCluige.iInput.bind_key(iCluige.input, LEFT_ACTION, KEY_LEFT);
     iCluige.iInput.bind_key(iCluige.input, START_ACTION, ' ');
     iCluige.iInput.bind_key(iCluige.input, QUIT_ACTION, 'x');
     iCluige.iInput.bind_key(iCluige.input, QUIT_ACTION, 'X');
@@ -249,11 +259,22 @@ int main()
 	iCluige.iNode2D.moveLocal(gameRootNode2D, (Vector2){50., 35.});
 	iCluige.iNode.addChild(iCluige.publicRoot2D, gameRootRootNode);
 
+
+	hudSpriteText = iCluige.iSpriteText.newSpriteText();
+	Node* hudNode = hudSpriteText->_thisNode2D->_thisNode;
+	iCluige.iNode.setName(hudNode, "Hud");
+	iCluige.iSpriteText.setText(hudSpriteText,
+            "start :  SPACE\n\n               E\nimpulse :    S   F\n               D\n\nexit :  X");
+	iCluige.iNode2D.moveLocal(hudSpriteText->_thisNode2D, (Vector2){-40, -32});
+	iCluige.iNode.addChild(gameRootRootNode, hudNode);
+
 	SpriteText* planetSpriteText = iCluige.iSpriteText.newSpriteText();
 	Node* planetNode = planetSpriteText->_thisNode2D->_thisNode;
 	iCluige.iNode.setName(planetNode, "Planet");
-	iCluige.iSpriteText.setText(planetSpriteText, "O");
+	iCluige.iSpriteText.setText(planetSpriteText,
+            "  .-'-.\n /     \\\n        .\n|       |\n|       |\n`       '\n \\     /\n  `...'");
 //	iCluige.iNode2D.moveLocal(planetSpriteText->_thisNode2D, (Vector2){1, 1.});
+	planetSpriteText->offset = (Vector2){4, 3};//origin at center
 	iCluige.iNode.addChild(gameRootRootNode, planetNode);
 
 	SpriteText* playerSpriteText = iCluige.iSpriteText.newSpriteText();
@@ -261,7 +282,6 @@ int main()
 	iCluige.iNode.setName(playerNode, "Player");
 	iCluige.iNode.addChild(gameRootRootNode, playerNode);
 	iCluige.iSpriteText.setText(playerSpriteText, "#");
-//	playerSpriteText->offset = (Vector2){1, 2};//origin at feet of player
 //	iCluige.iNode2D.moveLocal(playerSpriteText->_thisNode2D, (Vector2){-1., -1.});
 	/*Player* playerScript =*/ newPlayer(playerNode);
 
@@ -331,6 +351,12 @@ int main()
 //	comp = iCluige.iVariant.compare(VT_FLOAT, varf, vaarf);
 //	comp = iCluige.iVariant.compare(VT_DOUBLE, vard, vaard);
 //	comp = iCluige.iVariant.compare(VT_POINTER, varptr, vaarptr);
+
+	char* stackheapTest = iCluige.iStringBuilder.stack_to_heap("essai stack to heap");
+	char* formatheapTest = iCluige.iStringBuilder.formatted_to_heap(
+            60, "essai %f form to heap %d %s", 49.3, 12, "blbl");
+	free(stackheapTest);
+	free(formatheapTest);
 */
 
 #ifdef IN_GAME_JAM_CREAJAM1
