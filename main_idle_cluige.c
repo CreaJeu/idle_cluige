@@ -39,19 +39,19 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
     Player* thisPlayer =
         (Player*)(thisScript->_subClass);
     Node2D* thisNode2D = thisPlayer->ownerSprite->_thisNode2D;
-    struct _Input* ii = iCluige.input;
+//    struct _Input* ii = iCluige.input;
     struct iiInput* iii = &iCluige.iInput;
     float weight = 2500;
     float impulseStrength = 4;
 
-    if(iii->is_action_just_pressed(ii, QUIT_ACTION))
+    if(iii->is_action_just_pressed(QUIT_ACTION))
     {
         iCluige.quitAsked = true;
         return;
     }
     if(!(thisPlayer->started))
     {
-        if(iii->is_action_just_pressed(ii, START_ACTION))//' '
+        if(iii->is_action_just_pressed(START_ACTION))//' '
         {
             iCluige.iNode2D.moveLocal(hudSpriteText->_thisNode2D, (Vector2){-5, -8});
             thisPlayer->started = true;
@@ -72,19 +72,19 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
     }
 
     iCluige.iVector2.set(&impulse, 0, 0);
-    if(iii->is_action_just_pressed(ii, UP_ACTION))
+    if(iii->is_action_just_pressed(UP_ACTION))
     {
         impulse.y -= impulseStrength;
     }
-    if(iii->is_action_just_pressed(ii, DOWN_ACTION))
+    if(iii->is_action_just_pressed(DOWN_ACTION))
     {
         impulse.y += impulseStrength;
     }
-    if(iii->is_action_just_pressed(ii, LEFT_ACTION))
+    if(iii->is_action_just_pressed(LEFT_ACTION))
     {
         impulse.x -= impulseStrength;
     }
-    if(iii->is_action_just_pressed(ii, RIGHT_ACTION))
+    if(iii->is_action_just_pressed(RIGHT_ACTION))
     {
         impulse.x += impulseStrength;
     }
@@ -211,47 +211,32 @@ int main()
 
 #else
 	//game jam 2023_03_24
-	StringBuilder sb_gj3;
-	char* actionUpName = iCluige.iStringBuilder.stringAlloc(&sb_gj3, 5);
-	iCluige.iStringBuilder.append(&sb_gj3, "up");
-	UP_ACTION = iCluige.iInput.add_action(
-            iCluige.input, actionUpName);
-	char* actionDownName = iCluige.iStringBuilder.stringAlloc(&sb_gj3, 5);
-	iCluige.iStringBuilder.append(&sb_gj3, "down");
-	DOWN_ACTION = iCluige.iInput.add_action(
-            iCluige.input, actionDownName);
-	char* actionLeftName = iCluige.iStringBuilder.stringAlloc(&sb_gj3, 5);
-	iCluige.iStringBuilder.append(&sb_gj3, "left");
-	LEFT_ACTION = iCluige.iInput.add_action(
-            iCluige.input, actionLeftName);
-	char* actionRightName = iCluige.iStringBuilder.stringAlloc(&sb_gj3, 5);
-	iCluige.iStringBuilder.append(&sb_gj3, "right");
-	RIGHT_ACTION = iCluige.iInput.add_action(
-            iCluige.input, actionRightName);
-	char* actionStartName = iCluige.iStringBuilder.stringAlloc(&sb_gj3, 5);
-	iCluige.iStringBuilder.append(&sb_gj3, "start");
-	START_ACTION = iCluige.iInput.add_action(
-            iCluige.input, actionStartName);
-	char* actionQuitName = iCluige.iStringBuilder.stringAlloc(&sb_gj3, 5);
-	iCluige.iStringBuilder.append(&sb_gj3, "quit");
-	QUIT_ACTION = iCluige.iInput.add_action(
-            iCluige.input, actionQuitName);
+	UP_ACTION = iCluige.iInput.add_action("up");
+    iCluige.iInput.bind_key(UP_ACTION, 'e');
+    iCluige.iInput.bind_key(UP_ACTION, 'E');
+    iCluige.iInput.bind_key(UP_ACTION, KEY_UP);
 
-    iCluige.iInput.bind_key(iCluige.input, UP_ACTION, 'e');
-    iCluige.iInput.bind_key(iCluige.input, UP_ACTION, 'E');
-    iCluige.iInput.bind_key(iCluige.input, UP_ACTION, KEY_UP);
-    iCluige.iInput.bind_key(iCluige.input, DOWN_ACTION, 'd');
-    iCluige.iInput.bind_key(iCluige.input, DOWN_ACTION, 'D');
-    iCluige.iInput.bind_key(iCluige.input, DOWN_ACTION, KEY_DOWN);
-    iCluige.iInput.bind_key(iCluige.input, RIGHT_ACTION, 'f');
-    iCluige.iInput.bind_key(iCluige.input, RIGHT_ACTION, 'F');
-    iCluige.iInput.bind_key(iCluige.input, RIGHT_ACTION, KEY_RIGHT);
-    iCluige.iInput.bind_key(iCluige.input, LEFT_ACTION, 's');
-    iCluige.iInput.bind_key(iCluige.input, LEFT_ACTION, 'S');
-    iCluige.iInput.bind_key(iCluige.input, LEFT_ACTION, KEY_LEFT);
-    iCluige.iInput.bind_key(iCluige.input, START_ACTION, ' ');
-    iCluige.iInput.bind_key(iCluige.input, QUIT_ACTION, 'x');
-    iCluige.iInput.bind_key(iCluige.input, QUIT_ACTION, 'X');
+	DOWN_ACTION = iCluige.iInput.add_action("down");
+    iCluige.iInput.bind_key(DOWN_ACTION, 'd');
+    iCluige.iInput.bind_key(DOWN_ACTION, 'D');
+    iCluige.iInput.bind_key(DOWN_ACTION, KEY_DOWN);
+
+	LEFT_ACTION = iCluige.iInput.add_action("left");
+    iCluige.iInput.bind_key(LEFT_ACTION, 's');
+    iCluige.iInput.bind_key(LEFT_ACTION, 'S');
+    iCluige.iInput.bind_key(LEFT_ACTION, KEY_LEFT);
+
+	RIGHT_ACTION = iCluige.iInput.add_action("right");
+    iCluige.iInput.bind_key(RIGHT_ACTION, 'f');
+    iCluige.iInput.bind_key(RIGHT_ACTION, 'F');
+    iCluige.iInput.bind_key(RIGHT_ACTION, KEY_RIGHT);
+
+	START_ACTION = iCluige.iInput.add_action("start");
+    iCluige.iInput.bind_key(START_ACTION, ' ');
+
+	QUIT_ACTION = iCluige.iInput.add_action("quit");
+    iCluige.iInput.bind_key(QUIT_ACTION, 'x');
+    iCluige.iInput.bind_key(QUIT_ACTION, 'X');
 
 	Node2D* gameRootNode2D = iCluige.iNode2D.newNode2D();
 	Node* gameRootRootNode = gameRootNode2D->_thisNode;
