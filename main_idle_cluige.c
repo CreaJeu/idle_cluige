@@ -176,26 +176,44 @@ int main()
 	cluigeInit();//makes all roots, set all functions pointers, etc.
 
 #ifndef NOT_IN_STUNJAM2023
+
+	Node2D* gameRootNode2D = iCluige.iNode2D.newNode2D();
+	Node* gameRootRootNode = gameRootNode2D->_thisNode;
+	iCluige.iNode.setName(gameRootRootNode, "Game");
+	iCluige.iNode2D.moveLocal(gameRootNode2D, (Vector2){5., 5.});
+	iCluige.iNode.addChild(iCluige.publicRoot2D, gameRootRootNode);
+
+	Node2D* playerNode2D = iCluige.iNode2D.newNode2D();
+	Node* playerNode = playerNode2D->_thisNode;
+	iCluige.iNode.setName(playerNode, "Player");
+	iCluige.iNode2D.moveLocal(gameRootNode2D, (Vector2){10., 30.});
+	iCluige.iNode.addChild(gameRootRootNode, playerNode);
+
+	SpriteSVG* playerMouthUpSpriteSVG = iCluige.iSpriteSVG.newSpriteSVG();
+	Node* MouthUp = playerMouthUpSpriteSVG->_thisNode2D->_thisNode;
+	iCluige.iNode.setName(MouthUp, "PlayerMouthUp");
+	iCluige.iNode.addChild(playerNode, MouthUp);
+	Vector2 essayPath[11] =
+        {
+            (Vector2){0, 0},
+            (Vector2){0.1, 3},
+            (Vector2){6, 9},
+            (Vector2){12, 9},
+            (Vector2){19, 3},
+            (Vector2){19, 2},
+            (Vector2){19, 4},
+            (Vector2){24, 9},
+            (Vector2){30, 9},
+            (Vector2){37, 3},
+            (Vector2){37, 0}
+        };
+    iCluige.iSpriteSVG.add_path_from_array(playerMouthUpSpriteSVG, essayPath, 11);
+//	iCluige.iNode2D.moveLocal(playerSpriteSVG->_thisNode2D, (Vector2){44, -10.});
+//	/*Player* playerScript =*/ newPlayer(playerNode);
+
     //mvaddstr(20, 35, ". · · ·l ");
-	drawLine(16.8, 45, 3.5, 45);
-
-	drawLine(17.5, 50.2, 3.3, 56);
-	drawLine(20.1, 54, 15, 97);
-
-	drawLine(23, 54, 23, 97);
-
-	drawLine(29, 54, 32, 97);
-	drawLine(32, 49, 45, 54);
-
-	drawLine(33, 45, 45, 45);
-
-	drawLine(32, 42, 45, 37);
-	drawLine(29, 38, 31, 3);
-
-	drawLine(23, 37, 23, 2);
-
-	drawLine(20, 38, 17, 3);
-	drawLine(17, 42, 3, 37);
+//	drawLine(16.8, 45, 3.5, 45);
+//	drawLine(17.5, 50.2, 3.3, 56);
 
 #endif // NOT_IN_GAME_JAM
 
@@ -335,7 +353,7 @@ int main()
 	iCluige.iSpriteText.setText(playerSpriteText, "#");
 //	iCluige.iNode2D.moveLocal(playerSpriteText->_thisNode2D, (Vector2){-1., -1.});
 	/*Player* playerScript =*/ newPlayer(playerNode);
-#endif // NOT_IN_GAME_JAM
+#endif // NOT_IN_GAME_JAM / NOT_IN_CREAJAM3
 
     //game loop
 	cluigeRun();
@@ -463,3 +481,55 @@ int main()
 	//iCluige.iNode.printTreePretty(iCluige.privateRoot2D);
 
 #endif // IN_GAME_JAM_CREAJAM1
+
+/*
+
+	Vector2 essayPath[9] =
+        {
+            (Vector2){16.8, 45},
+            (Vector2){3.5, 45},
+            (Vector2){17.5, 50.2},
+            (Vector2){3.3, 56},
+            (Vector2){20.1, 54},
+            (Vector2){15, 97},
+            (Vector2){23, 54},
+            (Vector2){23, 97},
+            (Vector2){29, 54}
+        };
+    iCluige.iSpriteSVG.add_path_from_array(playerSpriteSVG, essayPath, 9);
+	Vector2 essayPath2[9]  =
+        {
+            (Vector2){32, 97},
+            (Vector2){32, 49},
+            (Vector2){45, 54},
+            (Vector2){33, 45},
+            (Vector2){45, 45},
+            (Vector2){32, 42},
+            (Vector2){45, 37},
+            (Vector2){29, 38},
+            (Vector2){31, 3}
+        };
+    iCluige.iSpriteSVG.add_path_from_array(playerSpriteSVG, essayPath2, 9);
+	Vector2 essayPath3[6]  =
+        {
+            (Vector2){23, 37},
+            (Vector2){23, 2},
+            (Vector2){20, 38},
+            (Vector2){17, 3},
+            (Vector2){17, 42},
+            (Vector2){3, 37}
+        };
+    iCluige.iSpriteSVG.add_path_from_array(playerSpriteSVG, essayPath3, 6);
+
+
+        {
+            (Vector2){0, 0},
+            (Vector2){0, 5},
+            (Vector2){5, 15},
+            (Vector2){15, 20},
+            (Vector2){25, 20},
+            (Vector2){35, 15},
+            (Vector2){40, 5},
+            (Vector2){40, 0}
+        };
+*/
