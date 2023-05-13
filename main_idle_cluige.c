@@ -8,7 +8,7 @@
 //#include <windows.h>
 
 
-#ifndef NOT_IN_CREAJAM3
+#ifdef NOT_IN_CREAJAM3
 #include <../PDCurses/curses.h>
 #include <math.h>
 
@@ -126,6 +126,48 @@ Player* newPlayer(Node* thisNode)
 
 #endif // NOT_IN_CREAJAM3
 
+#ifndef NOT_IN_STUNJAM2023
+#include <../PDCurses/curses.h>
+
+//char shade(float s)
+//{
+//    char shades[3][3] =
+//    {
+//        {'\\', '|', '/'},
+//        {'-', ' ', '-'},
+//        {'/', '|', '\\'}
+//    };
+//    mvaddch(0/*y*/, 0/*x*/, shades[0][0]);
+//    mvaddch(0/*y*/, 1/*x*/, shades[0][1]);
+//    mvaddch(0/*y*/, 2/*x*/, shades[0][2]);
+//    mvaddch(1/*y*/, 0/*x*/, shades[1][0]);
+//    mvaddch(1/*y*/, 2/*x*/, shades[1][2]);
+//    mvaddch(2/*y*/, 0/*x*/, shades[2][0]);
+//    mvaddch(2/*y*/, 1/*x*/, shades[2][1]);
+//    mvaddch(2/*y*/, 2/*x*/, shades[2][2]);
+//	return '\'';
+//}
+
+void drawLine(const float start_x, const float start_y, const float end_x, const float end_y)
+{
+    Vector2 start_pos = {start_x, start_y};
+    Vector2 end_pos = {end_x, end_y};
+
+	LineDrawerThin d;
+    iCluige.iLineDrawerThin.start(&d, &start_pos, &end_pos);
+	while(!iCluige.iLineDrawerThin.hasFinished(&d))
+	{
+	    const char* glyph = iCluige.iLineDrawerThin.glyph(&d);
+		//mvaddch(d.current_position.y, d.current_position.x, shade(d.curr_dist));
+		mvaddstr(d.current_position.y, d.current_position.x, glyph);
+
+		iCluige.iLineDrawerThin.next(&d);
+	}
+}
+
+#endif // NOT_IN_STUNJAM2023
+
+
 int main()
 {
     //SetConsoleOutputCP(CP_UTF8);
@@ -133,7 +175,31 @@ int main()
     //init
 	cluigeInit();//makes all roots, set all functions pointers, etc.
 
-	#ifdef NOT_IN_GAME_JAM
+#ifndef NOT_IN_STUNJAM2023
+    //mvaddstr(20, 35, ". · · ·l ");
+	drawLine(16.8, 45, 3.5, 45);
+
+	drawLine(17.5, 50.2, 3.3, 56);
+	drawLine(20.1, 54, 15, 97);
+
+	drawLine(23, 54, 23, 97);
+
+	drawLine(29, 54, 32, 97);
+	drawLine(32, 49, 45, 54);
+
+	drawLine(33, 45, 45, 45);
+
+	drawLine(32, 42, 45, 37);
+	drawLine(29, 38, 31, 3);
+
+	drawLine(23, 37, 23, 2);
+
+	drawLine(20, 38, 17, 3);
+	drawLine(17, 42, 3, 37);
+
+#endif // NOT_IN_GAME_JAM
+
+#ifdef NOT_IN_GAME_JAM
 
 	//here hardcode or parse my scene from file
 	//...
@@ -209,7 +275,7 @@ int main()
 	iCluige.iDeque.deleteDeque(&dqTest);
 	free(dqMsg);
 
-#else
+#elifdef NOT_IN_CREAJAM3
 	//game jam 2023_03_24
 	UP_ACTION = iCluige.iInput.add_action("up");
     iCluige.iInput.bind_key(UP_ACTION, 'e');
@@ -269,11 +335,7 @@ int main()
 	iCluige.iSpriteText.setText(playerSpriteText, "#");
 //	iCluige.iNode2D.moveLocal(playerSpriteText->_thisNode2D, (Vector2){-1., -1.});
 	/*Player* playerScript =*/ newPlayer(playerNode);
-
 #endif // NOT_IN_GAME_JAM
-
-
-
 
     //game loop
 	cluigeRun();

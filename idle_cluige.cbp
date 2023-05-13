@@ -15,7 +15,7 @@
 					<Add option="-g" />
 				</Compiler>
 				<Linker>
-					<Add library="../cluige/bin/Debug/libcluige.dll" />
+					<Add library="../cluige/bin/Debug/libcluige.a" />
 					<Add directory="../cluige/bin/Debug" />
 				</Linker>
 			</Target>
