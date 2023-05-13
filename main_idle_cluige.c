@@ -180,34 +180,116 @@ int main()
 	Node2D* gameRootNode2D = iCluige.iNode2D.newNode2D();
 	Node* gameRootRootNode = gameRootNode2D->_thisNode;
 	iCluige.iNode.setName(gameRootRootNode, "Game");
-	iCluige.iNode2D.moveLocal(gameRootNode2D, (Vector2){5., 5.});
+	iCluige.iNode2D.moveLocal(gameRootNode2D, (Vector2){15., 15.});
 	iCluige.iNode.addChild(iCluige.publicRoot2D, gameRootRootNode);
 
 	Node2D* playerNode2D = iCluige.iNode2D.newNode2D();
 	Node* playerNode = playerNode2D->_thisNode;
 	iCluige.iNode.setName(playerNode, "Player");
-	iCluige.iNode2D.moveLocal(gameRootNode2D, (Vector2){10., 30.});
+	iCluige.iNode2D.moveLocal(gameRootNode2D, (Vector2){20., 30.});
 	iCluige.iNode.addChild(gameRootRootNode, playerNode);
 
 	SpriteSVG* playerMouthUpSpriteSVG = iCluige.iSpriteSVG.newSpriteSVG();
 	Node* MouthUp = playerMouthUpSpriteSVG->_thisNode2D->_thisNode;
 	iCluige.iNode.setName(MouthUp, "PlayerMouthUp");
 	iCluige.iNode.addChild(playerNode, MouthUp);
+//	playerMouthUpSpriteSVG->scale = (Vector2){3, 1};
 	Vector2 essayPath[11] =
         {
-            (Vector2){0, 0},
-            (Vector2){0.1, 3},
-            (Vector2){6, 9},
-            (Vector2){12, 9},
-            (Vector2){19, 3},
-            (Vector2){19, 2},
-            (Vector2){19, 4},
-            (Vector2){24, 9},
-            (Vector2){30, 9},
-            (Vector2){37, 3},
-            (Vector2){37, 0}
+            (Vector2){-18, -9},
+            (Vector2){-17.9, -6},
+            (Vector2){-12, 0},
+            (Vector2){-6, 0},
+            (Vector2){0, -6},
+            (Vector2){0, -7},
+            (Vector2){0, -5},
+            (Vector2){6, 0},
+            (Vector2){13, 0},
+            (Vector2){19, -6},
+            (Vector2){19, -9}
         };
     iCluige.iSpriteSVG.add_path_from_array(playerMouthUpSpriteSVG, essayPath, 11);
+
+	SpriteSVG* playerMouthDownSpriteSVG = iCluige.iSpriteSVG.newSpriteSVG();
+	Node* mouthDown = playerMouthDownSpriteSVG->_thisNode2D->_thisNode;
+	iCluige.iNode.setName(mouthDown, "PlayerMouthDown");
+	iCluige.iNode.addChild(playerNode, mouthDown);
+	Vector2 mouthDownPath[6] =
+        {
+            (Vector2){-8.9324678, 1.0217732},
+            (Vector2){-8.9, 3.9805214},
+            (Vector2){-4, 8.9},
+            (Vector2){3, 8.9},
+            (Vector2){8.8, 3.9805214},
+            (Vector2){8.9324678, 1.0217732},
+        };
+    iCluige.iSpriteSVG.add_path_from_array(playerMouthDownSpriteSVG, mouthDownPath, 6);
+
+    SpriteSVG* playerFaceSpriteSVG = iCluige.iSpriteSVG.newSpriteSVG();
+	Node* face = playerFaceSpriteSVG->_thisNode2D->_thisNode;
+	iCluige.iNode.setName(face, "PlayerFace");
+	iCluige.iNode.addChild(playerNode, face);
+	Vector2 path4523[2] =
+        {
+            (Vector2){11.963193,-11.829885},
+            (Vector2){19.777945,-5.47902}
+        };
+    iCluige.iSpriteSVG.add_path_from_array_relative(playerFaceSpriteSVG, path4523, 2);
+	Vector2 path4525[2] =
+        {
+            (Vector2){14.635889,-9.825365},
+            (Vector2){15.234362,-1.33634}
+        };
+    iCluige.iSpriteSVG.add_path_from_array_relative(playerFaceSpriteSVG, path4525, 2);
+	Vector2 path4527[2] =
+        {
+            (Vector2){-11.289256,-11.161705},
+            (Vector2){-17.238884,-5.07813}
+        };
+    iCluige.iSpriteSVG.add_path_from_array_relative(playerFaceSpriteSVG, path4527, 2);
+	Vector2 path4529[2] =
+        {
+            (Vector2){-13.961951,-9.023555},
+            (Vector2){-12.02713,-1.73725}
+        };
+    iCluige.iSpriteSVG.add_path_from_array_relative(playerFaceSpriteSVG, path4529, 2);
+	Vector2 pupil1[2] =
+        {
+            (Vector2){-14,-21},
+            (Vector2){0,-9}
+        };
+    iCluige.iSpriteSVG.add_path_from_array_relative(playerFaceSpriteSVG, pupil1, 2);
+	Vector2 pupil2[2] =
+        {
+            (Vector2){14,-21},
+            (Vector2){0,-9}
+        };
+    iCluige.iSpriteSVG.add_path_from_array_relative(playerFaceSpriteSVG, pupil2, 2);
+
+	Vector2 path4506[7] =
+        {
+            (Vector2){-22.842508,-25.186425},
+            (Vector2){4.92332,-5.26367},
+            (Vector2){7.32625,0.3433},
+            (Vector2){4.1753534,6.56958},
+            (Vector2){-4.1852534,4.47433},
+            (Vector2){-7.725532,-0.14849},
+            (Vector2){-5,-7}
+        };
+    iCluige.iSpriteSVG.add_path_from_array_relative(playerFaceSpriteSVG, path4506, 7);
+	Vector2 path4506_9_2_7[7] =
+        {
+            (Vector2){22.842508,-25.186425},
+            (Vector2){-4.92332,-5.26367},
+            (Vector2){-7.32625,0.3433},
+            (Vector2){-4.1753534,6.56958},
+            (Vector2){4.1852534,4.47433},
+            (Vector2){7.725532,-0.14849},
+            (Vector2){5,-7}
+        };
+    iCluige.iSpriteSVG.add_path_from_array_relative(playerFaceSpriteSVG, path4506_9_2_7, 7);
+
+
 //	iCluige.iNode2D.moveLocal(playerSpriteSVG->_thisNode2D, (Vector2){44, -10.});
 //	/*Player* playerScript =*/ newPlayer(playerNode);
 
