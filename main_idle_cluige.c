@@ -442,6 +442,13 @@ int main()
 	iCluige.iNode.addChild(gameRootRootNode, playerNode);
 	newPlayer(playerNode);
 
+	SpriteText* hudSpriteText = iCluige.iSpriteText.newSpriteText();
+	Node* hudNode = hudSpriteText->_thisNode2D->_thisNode;
+	iCluige.iNode.setName(hudNode, "Hud");
+	iCluige.iSpriteText.setText(hudSpriteText,
+            "\n             E\n  speak :  S   F\n             D\n\n\n  exit :  X");
+	iCluige.iNode2D.moveLocal(hudSpriteText->_thisNode2D, (Vector2){-12, 23});
+	iCluige.iNode.addChild(gameRootRootNode, hudNode);
 
 
 //	iCluige.iNode2D.moveLocal(playerSpriteSVG->_thisNode2D, (Vector2){44, -10.});
