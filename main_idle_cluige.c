@@ -446,7 +446,7 @@ int main()
 	Node* hudNode = hudSpriteText->_thisNode2D->_thisNode;
 	iCluige.iNode.setName(hudNode, "Hud");
 	iCluige.iSpriteText.setText(hudSpriteText,
-            "\n             E\n  speak :  S   F\n             D\n\n\n  exit :  X");
+            "\n             E\n  speak :  S   F\n             D\n\n\n  exit :  X\n\n\n\nOnly images here, sound \nis not yet possible !");
 	iCluige.iNode2D.moveLocal(hudSpriteText->_thisNode2D, (Vector2){-12, 23});
 	iCluige.iNode.addChild(gameRootRootNode, hudNode);
 
