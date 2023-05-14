@@ -143,8 +143,11 @@ struct _Player
     SpriteSVG* eyesSpriteSVG;
     float timeTillBlink;
     int blinkStep;
+    float foe;
+    int hitsTillFoe;
 };
 typedef struct _Player Player;
+Player* newPlayer(Node* thisNode);
 
 void deletePlayer(Script* thisScript)
 {
@@ -156,6 +159,8 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
     Player* thisPlayer =
         (Player*)(thisScript->_subClass);
     struct iiInput* iii = &iCluige.iInput;
+    float f = thisPlayer->foe;
+    bool acted = false;
 
     if(iii->is_action_just_pressed(QUIT_ACTION))
     {
@@ -164,28 +169,65 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
     }
     if(iii->is_action_just_pressed(HIGHER_ACTION))
     {
-        thisPlayer->mouthUpSpriteSVG->scale.y = 1 + (1 * .5);
-        thisPlayer->mouthDownSpriteSVG->scale.y = 1.5;
+        thisPlayer->mouthUpSpriteSVG->scale.y = 1 + (f * .5);
+        thisPlayer->mouthDownSpriteSVG->scale.y = 1 + (f * .5);
+        acted = true;
     }
     if(iii->is_action_just_pressed(LOWER_ACTION))
     {
-        thisPlayer->mouthUpSpriteSVG->scale.y = 1 - (1 * .5);
-        thisPlayer->mouthDownSpriteSVG->scale.y = .5;
+        thisPlayer->mouthUpSpriteSVG->scale.y = 1 - (f * .5);
+        thisPlayer->mouthDownSpriteSVG->scale.y = 1 - (f * .5);
+        acted = true;
     }
     if(iii->is_action_just_pressed(WIDER_ACTION))
     {
-        thisPlayer->mouthUpSpriteSVG->scale.x = 1.5;
-        thisPlayer->mouthDownSpriteSVG->scale.x = 1.5;
+        thisPlayer->mouthUpSpriteSVG->scale.x = 1 + (f * .5);
+        thisPlayer->mouthDownSpriteSVG->scale.x = 1 + (f * .5);
+        acted = true;
     }
     if(iii->is_action_just_pressed(NARROWER_ACTION))
     {
-        thisPlayer->mouthUpSpriteSVG->scale.x = .5;
-        thisPlayer->mouthDownSpriteSVG->scale.x = .5;
+        thisPlayer->mouthUpSpriteSVG->scale.x = 1 - (f * .5);
+        thisPlayer->mouthDownSpriteSVG->scale.x = 1 - (f * .5);
+        acted = true;
     }
+
+    if(f > 0)
+    {
+        if(acted)
+        {
+            if(thisPlayer->hitsTillFoe > 0)
+            {
+                thisPlayer->hitsTillFoe--;
+            }
+            else if(thisPlayer->hitsTillFoe == 0)
+            {
+                thisPlayer->hitsTillFoe = -1;
+                Node2D* enemyNode2D = iCluige.iNode2D.newNode2D();
+                Node* enemyNode = enemyNode2D->_thisNode;
+                iCluige.iNode.setName(enemyNode, "Enemy");
+                iCluige.iNode2D.moveLocal(enemyNode2D, (Vector2){99., 20.});
+                iCluige.iNode.addChild(thisScript->node, enemyNode);
+                newPlayer(enemyNode);
+                Player* foe = (Player*)(enemyNode->script->_subClass);
+                foe->foe = -1;
+            }
+        }
+    }
+    else
+    {
+        Node2D* thisNode2D = (Node2D*)(thisScript->node->_subClass);
+        if(thisNode2D->position.x > 65)
+        {
+            iCluige.iNode2D.moveLocal(thisNode2D, (Vector2){-30 * elapsedSeconds, 0});
+        }
+    }
+
 
     float x_speed = 2;
     float y_speed = 2;
-    if(thisPlayer->mouthUpSpriteSVG->scale.x < 1)
+    float adv = (thisPlayer->mouthUpSpriteSVG->scale.x - 1);
+    if(adv < 0)
     {
         thisPlayer->mouthUpSpriteSVG->scale.x += 1 * x_speed * elapsedSeconds;
         thisPlayer->mouthDownSpriteSVG->scale.x += x_speed * elapsedSeconds;
@@ -194,7 +236,7 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
             thisPlayer->mouthUpSpriteSVG->scale.x = 1;
         }
     }
-    else if(thisPlayer->mouthUpSpriteSVG->scale.x > 1)
+    else if(adv > 0)
     {
         thisPlayer->mouthUpSpriteSVG->scale.x -= 1 * x_speed * elapsedSeconds;
         thisPlayer->mouthDownSpriteSVG->scale.x -= x_speed * elapsedSeconds;
@@ -204,7 +246,8 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
         }
     }
 
-    if(thisPlayer->mouthUpSpriteSVG->scale.y < 1)
+    adv = (thisPlayer->mouthUpSpriteSVG->scale.y - 1);
+    if(adv < 0)
     {
         thisPlayer->mouthUpSpriteSVG->scale.y += y_speed * elapsedSeconds;
         thisPlayer->mouthDownSpriteSVG->scale.y += y_speed * elapsedSeconds;
@@ -213,7 +256,7 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
             thisPlayer->mouthUpSpriteSVG->scale.y = 1;
         }
     }
-    else if(thisPlayer->mouthUpSpriteSVG->scale.y > 1)
+    else if(adv > 0)
     {
         thisPlayer->mouthUpSpriteSVG->scale.y -= y_speed * elapsedSeconds;
         thisPlayer->mouthDownSpriteSVG->scale.y -= y_speed * elapsedSeconds;
@@ -269,6 +312,8 @@ Player* newPlayer(Node* thisNode)
     newPlayer->thisScript = newScript;
     newPlayer->blinkStep = 0;
     newPlayer->timeTillBlink = 3;
+    newPlayer->foe = 1;
+    newPlayer->hitsTillFoe = 5;
 
     newScript->node = thisNode;
     newScript->deleteScript = deletePlayer;
@@ -447,12 +492,9 @@ int main()
 	iCluige.iNode.setName(hudNode, "Hud");
 	iCluige.iSpriteText.setText(hudSpriteText,
             "\n             E\n  speak :  S   F\n             D\n\n\n  exit :  X\n\n\n\nOnly images here, sound \nis not yet possible !");
-	iCluige.iNode2D.moveLocal(hudSpriteText->_thisNode2D, (Vector2){-12, 23});
+	iCluige.iNode2D.moveLocal(hudSpriteText->_thisNode2D, (Vector2){-12, 22});
 	iCluige.iNode.addChild(gameRootRootNode, hudNode);
 
-
-//	iCluige.iNode2D.moveLocal(playerSpriteSVG->_thisNode2D, (Vector2){44, -10.});
-//	/*Player* playerScript =*/ newPlayer(playerNode);
 
     //mvaddstr(20, 35, ". · · ·l ");
 //	drawLine(16.8, 45, 3.5, 45);

@@ -1,0 +1,10 @@
+
+Game Jam ! 
+
+Make the character speak :)
+
+This game is a (ultra) modest demo of our vectorial sprites feature, from our minimalist terminal-based-games engine, cluige. Our developer ambition is to import SVG files (at least paths inside them).
+
+cluige is open-source : https://github.com/CreaJeu/cluige
+
+This demo is only about images, sound is not yet possible in cluige !
