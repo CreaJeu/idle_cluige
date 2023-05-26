@@ -40,6 +40,10 @@
 			<Add option="-DPDC_WIDE" />
 			<Add directory="../cluige" />
 		</Compiler>
+		<Linker>
+			<Add option="-static-libgcc" />
+			<Add option="-static" />
+		</Linker>
 		<Unit filename="VaEtVient.c">
 			<Option compilerVar="CC" />
 		</Unit>
