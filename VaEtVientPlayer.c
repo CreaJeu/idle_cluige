@@ -4,35 +4,35 @@
 #include "VaEtVientPlayer.h"
 
 
-static void deleteVaEtVientPlayer(Script* thisScript)
+static void deleteVaEtVientPlayer(Script* this_Script)
 {
     struct VaEtVientPlayer* thisVaEtVientPlayer =
-        (struct VaEtVientPlayer*)(thisScript->_subClass);
+        (struct VaEtVientPlayer*)(this_Script->_sub_class);
     free(thisVaEtVientPlayer);
-    //free(thisScript);
-    thisScript->deleteScript(thisScript);
+    //free(this_Script);
+    this_Script->delete_Script(this_Script);
 }
 
-static void vaEtVientPlayer_process(Script* thisScript, float elapsedSeconds)
+static void vaEtVientPlayer_process(Script* this_Script, float elapsed_seconds)
 {
     struct VaEtVientPlayer* thisVaEtVientPlayer =
-        (struct VaEtVientPlayer*)(thisScript->_subClass);
-    Node2D* thisNode2D = thisVaEtVientPlayer->ownerSprite->_thisNode2D;
+        (struct VaEtVientPlayer*)(this_Script->_sub_class);
+    Node2D* this_Node2D = thisVaEtVientPlayer->ownerSprite->_this_Node2D;
 
     static float accelY = 36.;
     static float speedY = 0.;
 
-    speedY += accelY * elapsedSeconds;
-    float deplY = speedY * elapsedSeconds;
-    if(thisNode2D->position.y + deplY > -1)
+    speedY += accelY * elapsed_seconds;
+    float deplY = speedY * elapsed_seconds;
+    if(this_Node2D->position.y + deplY > -1)
     {
         speedY = -25.;//jump impulse
-        iCluige.iNode2D.setLocalPosition(thisNode2D,
-            (Vector2) { thisNode2D->position.x, -1. });
+        iCluige.iNode2D.set_local_position(this_Node2D,
+            (Vector2) { this_Node2D->position.x, -1. });
     }
     else
     {
-        iCluige.iNode2D.moveLocal(thisNode2D, (Vector2) { 0., deplY });
+        iCluige.iNode2D.move_local(this_Node2D, (Vector2) { 0., deplY });
     }
 //    if(getch() == ' ')
 //    {
@@ -41,18 +41,18 @@ static void vaEtVientPlayer_process(Script* thisScript, float elapsedSeconds)
 
 struct VaEtVientPlayer* newVaEtVientPlayer(Node* node)
 {
-    Script* newScript = iCluige.iScript.newScript(node);
-    struct VaEtVientPlayer* newVaEtVientPlayer = iCluige.checkedMalloc(sizeof(struct VaEtVientPlayer));
+    Script* new_Script = iCluige.iScript.new_Script(node);
+    struct VaEtVientPlayer* newVaEtVientPlayer = iCluige.checked_malloc(sizeof(struct VaEtVientPlayer));
 
-    newVaEtVientPlayer->_thisScript = newScript;
+    newVaEtVientPlayer->_this_Script = new_Script;
 
-    newScript->node = node;
-    newScript->deleteScript = deleteVaEtVientPlayer;
-//    newScript->ready = vaEtVient_ready;
-    newScript->process = vaEtVientPlayer_process;
-    newScript->_subClass = newVaEtVientPlayer;
+    new_Script->node = node;
+    new_Script->delete_Script = deleteVaEtVientPlayer;
+//    new_Script->ready = vaEtVient_ready;
+    new_Script->process = vaEtVientPlayer_process;
+    new_Script->_sub_class = newVaEtVientPlayer;
 
-    node->script = newScript;
+    node->script = new_Script;
 
     return newVaEtVientPlayer;
 }

@@ -9,10 +9,10 @@ struct VaEtVient
     SpriteText* ownerSprite;
 
 	//private
-	Script* _thisScript;
+	Script* _this_Script;
 
 	//virtual methods
-//	void (*deleteScript)(Script*);
+//	void (*delete_Script)(Script*);
 //	void (*process)(Node*, float delta);
 };
 struct VaEtVient* newVaEtVient(Node* node);

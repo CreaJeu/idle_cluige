@@ -7,8 +7,11 @@
 //if need (for debug) of SetConsoleOutputCP(CP_UTF8);
 //#include <windows.h>
 
+//#define IN_GAME_JAM_CREAJAM2
+//#define IN_CREAJAM3
+#define IN_STUNJAM2023
 
-#ifdef NOT_IN_CREAJAM3
+#ifdef IN_CREAJAM3
 #include <../PDCurses/curses.h>
 #include <math.h>
 
@@ -22,23 +25,23 @@ int QUIT_ACTION;
 struct _Player
 {
     SpriteText* ownerSprite;
-	Script* thisScript;
+	Script* this_Script;
 	Vector2 speed;
 	bool started;
 };
 typedef struct _Player Player;
 
-void deletePlayer(Script* thisScript)
+void deletePlayer(Script* this_Script)
 {
     //maybe one day
 }
 
 SpriteText* hudSpriteText;
-static void process_Player(Script* thisScript, float elapsedSeconds)
+static void process_Player(Script* this_Script, float elapsed_seconds)
 {
     Player* thisPlayer =
-        (Player*)(thisScript->_subClass);
-    Node2D* thisNode2D = thisPlayer->ownerSprite->_thisNode2D;
+        (Player*)(this_Script->_sub_class);
+    Node2D* this_Node2D = thisPlayer->ownerSprite->_this_Node2D;
 //    struct _Input* ii = iCluige.input;
     struct iiInput* iii = &iCluige.iInput;
     float weight = 2500;
@@ -46,14 +49,14 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
 
     if(iii->is_action_just_pressed(QUIT_ACTION))
     {
-        iCluige.quitAsked = true;
+        iCluige.quit_asked = true;
         return;
     }
     if(!(thisPlayer->started))
     {
         if(iii->is_action_just_pressed(START_ACTION))//' '
         {
-            iCluige.iNode2D.moveLocal(hudSpriteText->_thisNode2D, (Vector2){-5, -8});
+            iCluige.iNode2D.move_local(hudSpriteText->_this_Node2D, (Vector2){-5, -8});
             thisPlayer->started = true;
             thisPlayer->speed = (Vector2){impulseStrength * 2, 0};
         }
@@ -61,14 +64,14 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
     }
 
     Vector2 gravity, impulse, dSpeed, dPos;
-    Vector2* pos = &(thisNode2D->position);
+    Vector2* pos = &(this_Node2D->position);
     //planet center (hence gravity) is centered on local (0,0)
     gravity = *pos;
     float h = iCluige.iVector2.length(pos);
     // 1/h => normalize, 1/h² => gravity, 1/h^3.2 => fun
     if(h > 10 * FLT_EPSILON)
     {
-        iCluige.iVector2.kMul(&gravity, -weight/powf(h,3.2), &gravity);
+        iCluige.iVector2.k_mul(&gravity, -weight/powf(h,3.2), &gravity);
     }
 
     iCluige.iVector2.set(&impulse, 0, 0);
@@ -89,44 +92,44 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
         impulse.x += impulseStrength;
     }
 
-    iCluige.iVector2.kMul(&gravity, elapsedSeconds, &dSpeed);
+    iCluige.iVector2.k_mul(&gravity, elapsed_seconds, &dSpeed);
     iCluige.iVector2.add(&(thisPlayer->speed), &dSpeed, &(thisPlayer->speed));
     iCluige.iVector2.add(&(thisPlayer->speed), &impulse, &(thisPlayer->speed));
 
     iCluige.iVector2.set(&dPos, 0, 0);
-    iCluige.iVector2.kMul(&thisPlayer->speed, elapsedSeconds, &dPos);
+    iCluige.iVector2.k_mul(&thisPlayer->speed, elapsed_seconds, &dPos);
 
-    iCluige.iNode2D.moveLocal(thisNode2D, dPos);
+    iCluige.iNode2D.move_local(this_Node2D, dPos);
 
 }
 
-Player* newPlayer(Node* thisNode)
+Player* newPlayer(Node* this_Node)
 {
-    Script* newScript = iCluige.iScript.newScript(thisNode);
-    Player* newPlayer = iCluige.checkedMalloc(sizeof(Player));
+    Script* new_Script = iCluige.iScript.new_Script(this_Node);
+    Player* newPlayer = iCluige.checked_malloc(sizeof(Player));
 
-    newPlayer->thisScript = newScript;
+    newPlayer->this_Script = new_Script;
     newPlayer->started = false;
     newPlayer->speed = (Vector2){0, 0};
 
-    newScript->node = thisNode;
-    newScript->deleteScript = deletePlayer;
-    newScript->process = process_Player;
-    newScript->_subClass = newPlayer;
+    new_Script->node = this_Node;
+    new_Script->delete_Script = deletePlayer;
+    new_Script->process = process_Player;
+    new_Script->_sub_class = newPlayer;
 
-    thisNode->script = newScript;
+    this_Node->script = new_Script;
 
-    Node2D* thisNode2D = (Node2D*)(thisNode->_subClass);
-    SpriteText* thisSpriteText = (SpriteText*)(thisNode2D->_subClass);
-	newPlayer->ownerSprite = thisSpriteText;
-	iCluige.iNode2D.setLocalPosition(thisNode2D, (Vector2){-10,-20});
+    Node2D* this_Node2D = (Node2D*)(this_Node->_sub_class);
+    SpriteText* this_SpriteText = (SpriteText*)(this_Node2D->_sub_class);
+	newPlayer->ownerSprite = this_SpriteText;
+	iCluige.iNode2D.set_local_position(this_Node2D, (Vector2){-10,-20});
 
     return newPlayer;
 }
 
 #endif // NOT_IN_CREAJAM3
 
-#ifndef NOT_IN_STUNJAM2023
+#ifdef IN_STUNJAM2023
 #include <../PDCurses/curses.h>
 
 int HIGHER_ACTION;
@@ -137,7 +140,7 @@ int QUIT_ACTION;
 
 struct _Player
 {
-	Script* thisScript;
+	Script* this_Script;
     SpriteSVG* mouthUpSpriteSVG;
     SpriteSVG* mouthDownSpriteSVG;
     SpriteSVG* eyesSpriteSVG;
@@ -147,24 +150,24 @@ struct _Player
     int hitsTillFoe;
 };
 typedef struct _Player Player;
-Player* newPlayer(Node* thisNode);
+Player* newPlayer(Node* this_Node);
 
-void deletePlayer(Script* thisScript)
+void deletePlayer(Script* this_Script)
 {
     //maybe one day
 }
 
-static void process_Player(Script* thisScript, float elapsedSeconds)
+static void process_Player(Script* this_Script, float elapsed_seconds)
 {
     Player* thisPlayer =
-        (Player*)(thisScript->_subClass);
+        (Player*)(this_Script->_sub_class);
     struct iiInput* iii = &iCluige.iInput;
     float f = thisPlayer->foe;
     bool acted = false;
 
     if(iii->is_action_just_pressed(QUIT_ACTION))
     {
-        iCluige.quitAsked = true;
+        iCluige.quit_asked = true;
         return;
     }
     if(iii->is_action_just_pressed(HIGHER_ACTION))
@@ -203,23 +206,23 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
             else if(thisPlayer->hitsTillFoe == 0)
             {
                 thisPlayer->hitsTillFoe = -1;
-                Node2D* enemyNode2D = iCluige.iNode2D.newNode2D();
-                Node* enemyNode = enemyNode2D->_thisNode;
-                iCluige.iNode.setName(enemyNode, "Enemy");
-                iCluige.iNode2D.moveLocal(enemyNode2D, (Vector2){99., 20.});
-                iCluige.iNode.addChild(thisScript->node, enemyNode);
+                Node2D* enemyNode2D = iCluige.iNode2D.new_Node2D();
+                Node* enemyNode = enemyNode2D->_this_Node;
+                iCluige.iNode.set_name(enemyNode, "Enemy");
+                iCluige.iNode2D.move_local(enemyNode2D, (Vector2){99., 20.});
+                iCluige.iNode.add_child(this_Script->node, enemyNode);
                 newPlayer(enemyNode);
-                Player* foe = (Player*)(enemyNode->script->_subClass);
+                Player* foe = (Player*)(enemyNode->script->_sub_class);
                 foe->foe = -1;
             }
         }
     }
     else
     {
-        Node2D* thisNode2D = (Node2D*)(thisScript->node->_subClass);
-        if(thisNode2D->position.x > 65)
+        Node2D* this_Node2D = (Node2D*)(this_Script->node->_sub_class);
+        if(this_Node2D->position.x > 65)
         {
-            iCluige.iNode2D.moveLocal(thisNode2D, (Vector2){-30 * elapsedSeconds, 0});
+            iCluige.iNode2D.move_local(this_Node2D, (Vector2){-30 * elapsed_seconds, 0});
         }
     }
 
@@ -229,8 +232,8 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
     float adv = (thisPlayer->mouthUpSpriteSVG->scale.x - 1);
     if(adv < 0)
     {
-        thisPlayer->mouthUpSpriteSVG->scale.x += 1 * x_speed * elapsedSeconds;
-        thisPlayer->mouthDownSpriteSVG->scale.x += x_speed * elapsedSeconds;
+        thisPlayer->mouthUpSpriteSVG->scale.x += 1 * x_speed * elapsed_seconds;
+        thisPlayer->mouthDownSpriteSVG->scale.x += x_speed * elapsed_seconds;
         if(thisPlayer->mouthUpSpriteSVG->scale.x > 1)
         {
             thisPlayer->mouthUpSpriteSVG->scale.x = 1;
@@ -238,8 +241,8 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
     }
     else if(adv > 0)
     {
-        thisPlayer->mouthUpSpriteSVG->scale.x -= 1 * x_speed * elapsedSeconds;
-        thisPlayer->mouthDownSpriteSVG->scale.x -= x_speed * elapsedSeconds;
+        thisPlayer->mouthUpSpriteSVG->scale.x -= 1 * x_speed * elapsed_seconds;
+        thisPlayer->mouthDownSpriteSVG->scale.x -= x_speed * elapsed_seconds;
         if(thisPlayer->mouthUpSpriteSVG->scale.x < 1)
         {
             thisPlayer->mouthUpSpriteSVG->scale.x = 1;
@@ -249,8 +252,8 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
     adv = (thisPlayer->mouthUpSpriteSVG->scale.y - 1);
     if(adv < 0)
     {
-        thisPlayer->mouthUpSpriteSVG->scale.y += y_speed * elapsedSeconds;
-        thisPlayer->mouthDownSpriteSVG->scale.y += y_speed * elapsedSeconds;
+        thisPlayer->mouthUpSpriteSVG->scale.y += y_speed * elapsed_seconds;
+        thisPlayer->mouthDownSpriteSVG->scale.y += y_speed * elapsed_seconds;
         if(thisPlayer->mouthUpSpriteSVG->scale.y > 1)
         {
             thisPlayer->mouthUpSpriteSVG->scale.y = 1;
@@ -258,8 +261,8 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
     }
     else if(adv > 0)
     {
-        thisPlayer->mouthUpSpriteSVG->scale.y -= y_speed * elapsedSeconds;
-        thisPlayer->mouthDownSpriteSVG->scale.y -= y_speed * elapsedSeconds;
+        thisPlayer->mouthUpSpriteSVG->scale.y -= y_speed * elapsed_seconds;
+        thisPlayer->mouthDownSpriteSVG->scale.y -= y_speed * elapsed_seconds;
         if(thisPlayer->mouthUpSpriteSVG->scale.y < 1)
         {
             thisPlayer->mouthUpSpriteSVG->scale.y = 1;
@@ -268,7 +271,7 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
 
     if(thisPlayer->timeTillBlink > 0)
     {
-        thisPlayer->timeTillBlink -= elapsedSeconds;
+        thisPlayer->timeTillBlink -= elapsed_seconds;
         if(thisPlayer->blinkStep == 0)
         {
             thisPlayer->eyesSpriteSVG->scale.y = 1;
@@ -276,12 +279,12 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
         else if(thisPlayer->blinkStep == 1)
         {
             //close
-            thisPlayer->eyesSpriteSVG->scale.y -= 5 * elapsedSeconds;
+            thisPlayer->eyesSpriteSVG->scale.y -= 5 * elapsed_seconds;
         }
         else
         {
             //open
-            thisPlayer->eyesSpriteSVG->scale.y += 3 * elapsedSeconds;
+            thisPlayer->eyesSpriteSVG->scale.y += 3 * elapsed_seconds;
         }
     }
     else
@@ -304,27 +307,27 @@ static void process_Player(Script* thisScript, float elapsedSeconds)
     }
 }
 
-Player* newPlayer(Node* thisNode)
+Player* newPlayer(Node* this_Node)
 {
-    Script* newScript = iCluige.iScript.newScript(thisNode);
-    Player* newPlayer = iCluige.checkedMalloc(sizeof(Player));
+    Script* new_Script = iCluige.iScript.new_Script(this_Node);
+    Player* newPlayer = iCluige.checked_malloc(sizeof(Player));
 
-    newPlayer->thisScript = newScript;
+    newPlayer->this_Script = new_Script;
     newPlayer->blinkStep = 0;
     newPlayer->timeTillBlink = 3;
     newPlayer->foe = 1;
     newPlayer->hitsTillFoe = 5;
 
-    newScript->node = thisNode;
-    newScript->deleteScript = deletePlayer;
-    newScript->process = process_Player;
-    newScript->_subClass = newPlayer;
-    thisNode->script = newScript;
+    new_Script->node = this_Node;
+    new_Script->delete_Script = deletePlayer;
+    new_Script->process = process_Player;
+    new_Script->_sub_class = newPlayer;
+    this_Node->script = new_Script;
 
-	SpriteSVG* playerMouthUpSpriteSVG = iCluige.iSpriteSVG.newSpriteSVG();
-	Node* MouthUp = playerMouthUpSpriteSVG->_thisNode2D->_thisNode;
-	iCluige.iNode.setName(MouthUp, "PlayerMouthUp");
-	iCluige.iNode.addChild(thisNode, MouthUp);
+	SpriteSVG* playerMouthUpSpriteSVG = iCluige.iSpriteSVG.new_SpriteSVG();
+	Node* MouthUp = playerMouthUpSpriteSVG->_this_Node2D->_this_Node;
+	iCluige.iNode.set_name(MouthUp, "PlayerMouthUp");
+	iCluige.iNode.add_child(this_Node, MouthUp);
 //	playerMouthUpSpriteSVG->scale = (Vector2){3, 1};
 	Vector2 essayPath[11] =
         {
@@ -342,10 +345,10 @@ Player* newPlayer(Node* thisNode)
         };
     iCluige.iSpriteSVG.add_path_from_array(playerMouthUpSpriteSVG, essayPath, 11);
 
-	SpriteSVG* playerMouthDownSpriteSVG = iCluige.iSpriteSVG.newSpriteSVG();
-	Node* mouthDown = playerMouthDownSpriteSVG->_thisNode2D->_thisNode;
-	iCluige.iNode.setName(mouthDown, "PlayerMouthDown");
-	iCluige.iNode.addChild(thisNode, mouthDown);
+	SpriteSVG* playerMouthDownSpriteSVG = iCluige.iSpriteSVG.new_SpriteSVG();
+	Node* mouthDown = playerMouthDownSpriteSVG->_this_Node2D->_this_Node;
+	iCluige.iNode.set_name(mouthDown, "PlayerMouthDown");
+	iCluige.iNode.add_child(this_Node, mouthDown);
 	Vector2 mouthDownPath[6] =
         {
             (Vector2){-8.9324678, 1.0217732},
@@ -357,10 +360,10 @@ Player* newPlayer(Node* thisNode)
         };
     iCluige.iSpriteSVG.add_path_from_array(playerMouthDownSpriteSVG, mouthDownPath, 6);
 
-    SpriteSVG* playerFaceSpriteSVG = iCluige.iSpriteSVG.newSpriteSVG();
-	Node* face = playerFaceSpriteSVG->_thisNode2D->_thisNode;
-	iCluige.iNode.setName(face, "PlayerFace");
-	iCluige.iNode.addChild(thisNode, face);
+    SpriteSVG* playerFaceSpriteSVG = iCluige.iSpriteSVG.new_SpriteSVG();
+	Node* face = playerFaceSpriteSVG->_this_Node2D->_this_Node;
+	iCluige.iNode.set_name(face, "PlayerFace");
+	iCluige.iNode.add_child(this_Node, face);
 	Vector2 path4523[2] =
         {
             (Vector2){11.963193,-11.829885},
@@ -386,16 +389,16 @@ Player* newPlayer(Node* thisNode)
         };
     iCluige.iSpriteSVG.add_path_from_array_relative(playerFaceSpriteSVG, path4529, 2);
 
-	Node2D* eyesNode2D = iCluige.iNode2D.newNode2D();
-	Node* eyesNode = eyesNode2D->_thisNode;
-	iCluige.iNode.setName(eyesNode, "eyes2d");
-	iCluige.iNode2D.moveLocal(eyesNode2D, (Vector2){0, -24.});
-	iCluige.iNode.addChild(thisNode, eyesNode);
+	Node2D* eyesNode2D = iCluige.iNode2D.new_Node2D();
+	Node* eyesNode = eyesNode2D->_this_Node;
+	iCluige.iNode.set_name(eyesNode, "eyes2d");
+	iCluige.iNode2D.move_local(eyesNode2D, (Vector2){0, -24.});
+	iCluige.iNode.add_child(this_Node, eyesNode);
 
-	SpriteSVG* eyesSpriteSVG = iCluige.iSpriteSVG.newSpriteSVG();
-	Node* eyes = eyesSpriteSVG->_thisNode2D->_thisNode;
-	iCluige.iNode.setName(eyes, "eyesSVG");
-	iCluige.iNode.addChild(eyesNode, eyes);
+	SpriteSVG* eyesSpriteSVG = iCluige.iSpriteSVG.new_SpriteSVG();
+	Node* eyes = eyesSpriteSVG->_this_Node2D->_this_Node;
+	iCluige.iNode.set_name(eyes, "eyesSVG");
+	iCluige.iNode.add_child(eyesNode, eyes);
 	Vector2 pupil1[2] =
         {
             (Vector2){-14,5},
@@ -439,7 +442,7 @@ Player* newPlayer(Node* thisNode)
     return newPlayer;
 }
 
-#endif // NOT_IN_STUNJAM2023
+#endif // IN_STUNJAM2023
 
 
 int main()
@@ -447,9 +450,68 @@ int main()
     //SetConsoleOutputCP(CP_UTF8);
 
     //init
-	cluigeInit();//makes all roots, set all functions pointers, etc.
+	cluige_init();//makes all roots, set all functions pointers, etc.
 
-#ifndef NOT_IN_STUNJAM2023
+
+#ifdef IN_GAME_JAM_CREAJAM2
+
+	//game jam 2023_02_04
+	Node2D* testUberRootNode2D = iCluige.iNode2D.new_Node2D();
+	Node* myTestUberRootNode = testUberRootNode2D->_this_Node;
+	iCluige.iNode.set_name(myTestUberRootNode, "test uber root");
+	iCluige.iNode2D.move_local(testUberRootNode2D, (Vector2){36., 40.});
+	iCluige.iNode.add_child(iCluige.public_root_2D, myTestUberRootNode);
+
+	Node2D* myRootNode2D = iCluige.iNode2D.new_Node2D();
+	Node* myRootNode = myRootNode2D->_this_Node;
+	iCluige.iNode.set_name(myRootNode, "Game");
+	iCluige.iNode2D.move_local(myRootNode2D, (Vector2){10., 25.});
+	iCluige.iNode.add_child(/*iCluige.public_root_2D*/myTestUberRootNode, myRootNode);
+
+	SpriteText* groundSpriteText = iCluige.iSpriteText.new_SpriteText();
+	Node* groundNode = groundSpriteText->_this_Node2D->_this_Node;
+	iCluige.iNode.set_name(groundNode, "Ground");
+	iCluige.iNode2D.move_local(groundSpriteText->_this_Node2D, (Vector2){0, 1});//11.5});//-8.5});//
+	iCluige.iNode.add_child(myRootNode, groundNode);
+	iCluige.iSpriteText.set_text(groundSpriteText, "=================================================");
+
+
+	SpriteText* blockSpriteText = iCluige.iSpriteText.new_SpriteText();
+	Node* blockNode = blockSpriteText->_this_Node2D->_this_Node;
+	iCluige.iNode.set_name(blockNode, "Block");
+	blockSpriteText->offset = (Vector2){2, 1.5};//origin at center
+	iCluige.iNode2D.move_local(blockSpriteText->_this_Node2D, (Vector2){0., -2.5});//
+	iCluige.iNode.add_child(myRootNode, blockNode);
+
+	struct VaEtVient* blockScript = newVaEtVient(blockNode);
+	blockScript->ownerSprite = blockSpriteText;
+
+
+	SpriteText* playerSpriteText = iCluige.iSpriteText.new_SpriteText();
+	Node* playerNode = playerSpriteText->_this_Node2D->_this_Node;
+	iCluige.iNode.set_name(playerNode, "Player");
+	iCluige.iNode.add_child(myRootNode, playerNode);
+	iCluige.iSpriteText.set_text(playerSpriteText, " o\n'U`\n \"   ");
+	playerSpriteText->offset = (Vector2){1, 2};//origin at feet of player
+	iCluige.iNode2D.move_local(playerSpriteText->_this_Node2D, (Vector2){25., 0.});
+	struct VaEtVientPlayer* playerScript = newVaEtVientPlayer(playerNode);
+	playerScript->ownerSprite = playerSpriteText;
+/*
+
+ o        #####
+'U`       #   #
+ "        #   #
+          #####
+
+ */
+
+	//iCluige.wanted_frame_seconds = .1;
+	//iCluige.clock->scale = .6;
+	//iCluige.iNode.print_tree_pretty(iCluige.private_root_2D);
+
+#endif // IN_GAME_JAM_CREAJAM2
+
+#ifdef IN_STUNJAM2023
 	HIGHER_ACTION = iCluige.iInput.add_action("HIGHER_ACTION");
     iCluige.iInput.bind_key(HIGHER_ACTION, 'e');
     iCluige.iInput.bind_key(HIGHER_ACTION, 'E');
@@ -474,80 +536,80 @@ int main()
     iCluige.iInput.bind_key(QUIT_ACTION, 'x');
     iCluige.iInput.bind_key(QUIT_ACTION, 'X');
 
-	Node2D* gameRootNode2D = iCluige.iNode2D.newNode2D();
-	Node* gameRootRootNode = gameRootNode2D->_thisNode;
-	iCluige.iNode.setName(gameRootRootNode, "Game");
-	iCluige.iNode2D.moveLocal(gameRootNode2D, (Vector2){15., 15.});
-	iCluige.iNode.addChild(iCluige.publicRoot2D, gameRootRootNode);
+	Node2D* gameRootNode2D = iCluige.iNode2D.new_Node2D();
+	Node* gameRootRootNode = gameRootNode2D->_this_Node;
+	iCluige.iNode.set_name(gameRootRootNode, "Game");
+	iCluige.iNode2D.move_local(gameRootNode2D, (Vector2){15., 15.});
+	iCluige.iNode.add_child(iCluige.public_root_2D, gameRootRootNode);
 
-	Node2D* playerNode2D = iCluige.iNode2D.newNode2D();
-	Node* playerNode = playerNode2D->_thisNode;
-	iCluige.iNode.setName(playerNode, "Player");
-	iCluige.iNode2D.moveLocal(gameRootNode2D, (Vector2){20., 30.});
-	iCluige.iNode.addChild(gameRootRootNode, playerNode);
+	Node2D* playerNode2D = iCluige.iNode2D.new_Node2D();
+	Node* playerNode = playerNode2D->_this_Node;
+	iCluige.iNode.set_name(playerNode, "Player");
+	iCluige.iNode2D.move_local(gameRootNode2D, (Vector2){20., 30.});
+	iCluige.iNode.add_child(gameRootRootNode, playerNode);
 	newPlayer(playerNode);
 
-	SpriteText* hudSpriteText = iCluige.iSpriteText.newSpriteText();
-	Node* hudNode = hudSpriteText->_thisNode2D->_thisNode;
-	iCluige.iNode.setName(hudNode, "Hud");
-	iCluige.iSpriteText.setText(hudSpriteText,
+	SpriteText* hudSpriteText = iCluige.iSpriteText.new_SpriteText();
+	Node* hudNode = hudSpriteText->_this_Node2D->_this_Node;
+	iCluige.iNode.set_name(hudNode, "Hud");
+	iCluige.iSpriteText.set_text(hudSpriteText,
             "\n             E\n  speak :  S   F\n             D\n\n\n  exit :  X\n\n\n\nOnly images here, sound \nis not yet possible !");
-	iCluige.iNode2D.moveLocal(hudSpriteText->_thisNode2D, (Vector2){-12, 22});
-	iCluige.iNode.addChild(gameRootRootNode, hudNode);
+	iCluige.iNode2D.move_local(hudSpriteText->_this_Node2D, (Vector2){-12, 22});
+	iCluige.iNode.add_child(gameRootRootNode, hudNode);
 
 
     //mvaddstr(20, 35, ". · · ·l ");
-//	drawLine(16.8, 45, 3.5, 45);
-//	drawLine(17.5, 50.2, 3.3, 56);
+//	draw_line(16.8, 45, 3.5, 45);
+//	draw_line(17.5, 50.2, 3.3, 56);
 
-#endif // NOT_IN_GAME_JAM
+#endif // IN_STUNJAM2023
 
 #ifdef NOT_IN_GAME_JAM
 
 	//here hardcode or parse my scene from file
 	//...
-	Node* n = iCluige.iNode.newNode();
-	iCluige.iNode.setName(n, "Idle Root");
-	iCluige.iNode.addChild(iCluige.publicRoot2D, n);
+	Node* n = iCluige.iNode.new_Node();
+	iCluige.iNode.set_name(n, "Idle Root");
+	iCluige.iNode.add_child(iCluige.public_root_2D, n);
 
-	//don't allocate nodes on stack, see deleteNode()
+	//don't allocate nodes on stack, see delete_Node()
 	//Node n;
 	//iCluige.iNode.initZero(&n);
 
 	//warning about node names:
 	//hardcoded strings in the form char* s = "hardcoded"
 	//are instanciated on the stack
-	//don't do n->name = s, use instead setName(n, s)
-//	wchar_t* plouf = iCluige.checkedMalloc(40 * sizeof(wchar_t));
+	//don't do n->name = s, use instead set_name(n, s)
+//	wchar_t* plouf = iCluige.checked_malloc(40 * sizeof(wchar_t));
 //	plouf[0]=L'b';plouf[1]=L'o';plouf[2]=L'b';plouf[3]=L'\0';//OK
-//	//plouf = L"bob";// <-- error on free() in deleteNode()
+//	//plouf = L"bob";// <-- error on free() in delete_Node()
 //	wprintf(L"%ls\n", plouf);
 //	free(plouf);//test either plouf = "..." or plouf[0] = ...
 
 	Node* pn;
 	for(int i=0; i<3; i++)
     {
-        pn = iCluige.iNode.newNode();
-        iCluige.iNode.addChild(n, pn);
-        Node* pn01 = iCluige.iNode.newNode();
-        iCluige.iNode.addChild(pn, pn01);
+        pn = iCluige.iNode.new_Node();
+        iCluige.iNode.add_child(n, pn);
+        Node* pn01 = iCluige.iNode.new_Node();
+        iCluige.iNode.add_child(pn, pn01);
     }//test on a gamer pc = 2minutes for 123456 iterations
 
-	Node* pn01 = iCluige.iNode.newNode();
-	iCluige.iNode.addChild(pn, pn01);
+	Node* pn01 = iCluige.iNode.new_Node();
+	iCluige.iNode.add_child(pn, pn01);
 	printf("my node name : %s\n", pn01->name);
 
 	printf("\ntree : \n");
-	iCluige.iNode.printTreePretty(iCluige.privateRoot2D);
+	iCluige.iNode.print_tree_pretty(iCluige.private_root_2D);
 
 
-	iCluige.iNode.setName(n, "Test Rename");
+	iCluige.iNode.set_name(n, "Test Rename");
 	printf("\ntree after root renamed: \n");
-	iCluige.iNode.printTreePretty(iCluige.privateRoot2D);
+	iCluige.iNode.print_tree_pretty(iCluige.private_root_2D);
 
 	//test Deque
 	Deque dqTest;
-	iCluige.iDeque.dequeAlloc(&dqTest, VT_DOUBLE, 9);
+	iCluige.iDeque.deque_alloc(&dqTest, VT_DOUBLE, 9);
 	iCluige.iDeque.push_back(&dqTest, 3.3);
 	iCluige.iDeque.push_back(&dqTest, 4.4);
 	iCluige.iDeque.push_back(&dqTest, 5.5);
@@ -566,7 +628,7 @@ int main()
 
 	StringBuilder sb_dq;
 	int sizeDequeMsg = iCluige.iDeque.size(&dqTest) * 9;//quick & dirty test
-	char* dqMsg = iCluige.iStringBuilder.stringAlloc(&sb_dq, sizeDequeMsg);
+	char* dqMsg = iCluige.iStringBuilder.string_alloc(&sb_dq, sizeDequeMsg);
 	//dqMsg[0] = 'u';dqMsg[1] = 0;
 	iCluige.iStringBuilder.append(&sb_dq, "[ ");
 	for(int iDq=0; iDq < iCluige.iDeque.size(&dqTest); iDq++)
@@ -575,10 +637,12 @@ int main()
         iCluige.iStringBuilder.append(&sb_dq, "%.1f ", val);
     }
     iCluige.iStringBuilder.append(&sb_dq, "]");
-	iCluige.iDeque.deleteDeque(&dqTest);
+	iCluige.iDeque.delete_Deque(&dqTest);
 	free(dqMsg);
 
-#elifdef NOT_IN_CREAJAM3
+#endif // NOT_IN_GAME_JAM
+
+#ifdef IN_CREAJAM3
 	//game jam 2023_03_24
 	UP_ACTION = iCluige.iInput.add_action("up");
     iCluige.iInput.bind_key(UP_ACTION, 'e');
@@ -607,44 +671,44 @@ int main()
     iCluige.iInput.bind_key(QUIT_ACTION, 'x');
     iCluige.iInput.bind_key(QUIT_ACTION, 'X');
 
-	Node2D* gameRootNode2D = iCluige.iNode2D.newNode2D();
-	Node* gameRootRootNode = gameRootNode2D->_thisNode;
-	iCluige.iNode.setName(gameRootRootNode, "Game");
-	iCluige.iNode2D.moveLocal(gameRootNode2D, (Vector2){50., 35.});
-	iCluige.iNode.addChild(iCluige.publicRoot2D, gameRootRootNode);
+	Node2D* gameRootNode2D = iCluige.iNode2D.new_Node2D();
+	Node* gameRootRootNode = gameRootNode2D->_this_Node;
+	iCluige.iNode.set_name(gameRootRootNode, "Game");
+	iCluige.iNode2D.move_local(gameRootNode2D, (Vector2){50., 35.});
+	iCluige.iNode.add_child(iCluige.public_root_2D, gameRootRootNode);
 
 
-	hudSpriteText = iCluige.iSpriteText.newSpriteText();
-	Node* hudNode = hudSpriteText->_thisNode2D->_thisNode;
-	iCluige.iNode.setName(hudNode, "Hud");
-	iCluige.iSpriteText.setText(hudSpriteText,
+	hudSpriteText = iCluige.iSpriteText.new_SpriteText();
+	Node* hudNode = hudSpriteText->_this_Node2D->_this_Node;
+	iCluige.iNode.set_name(hudNode, "Hud");
+	iCluige.iSpriteText.set_text(hudSpriteText,
             "start :  SPACE\n\n               E\nimpulse :    S   F\n               D\n\nexit :  X");
-	iCluige.iNode2D.moveLocal(hudSpriteText->_thisNode2D, (Vector2){-40, -32});
-	iCluige.iNode.addChild(gameRootRootNode, hudNode);
+	iCluige.iNode2D.move_local(hudSpriteText->_this_Node2D, (Vector2){-40, -32});
+	iCluige.iNode.add_child(gameRootRootNode, hudNode);
 
-	SpriteText* planetSpriteText = iCluige.iSpriteText.newSpriteText();
-	Node* planetNode = planetSpriteText->_thisNode2D->_thisNode;
-	iCluige.iNode.setName(planetNode, "Planet");
-	iCluige.iSpriteText.setText(planetSpriteText,
+	SpriteText* planetSpriteText = iCluige.iSpriteText.new_SpriteText();
+	Node* planetNode = planetSpriteText->_this_Node2D->_this_Node;
+	iCluige.iNode.set_name(planetNode, "Planet");
+	iCluige.iSpriteText.set_text(planetSpriteText,
             "  .-'-.\n /     \\\n        .\n|       |\n|       |\n`       '\n \\     /\n  `...'");
-//	iCluige.iNode2D.moveLocal(planetSpriteText->_thisNode2D, (Vector2){1, 1.});
+//	iCluige.iNode2D.move_local(planetSpriteText->_this_Node2D, (Vector2){1, 1.});
 	planetSpriteText->offset = (Vector2){4, 3};//origin at center
-	iCluige.iNode.addChild(gameRootRootNode, planetNode);
+	iCluige.iNode.add_child(gameRootRootNode, planetNode);
 
-	SpriteText* playerSpriteText = iCluige.iSpriteText.newSpriteText();
-	Node* playerNode = playerSpriteText->_thisNode2D->_thisNode;
-	iCluige.iNode.setName(playerNode, "Player");
-	iCluige.iNode.addChild(gameRootRootNode, playerNode);
-	iCluige.iSpriteText.setText(playerSpriteText, "#");
-//	iCluige.iNode2D.moveLocal(playerSpriteText->_thisNode2D, (Vector2){-1., -1.});
+	SpriteText* playerSpriteText = iCluige.iSpriteText.new_SpriteText();
+	Node* playerNode = playerSpriteText->_this_Node2D->_this_Node;
+	iCluige.iNode.set_name(playerNode, "Player");
+	iCluige.iNode.add_child(gameRootRootNode, playerNode);
+	iCluige.iSpriteText.set_text(playerSpriteText, "#");
+//	iCluige.iNode2D.move_local(playerSpriteText->_this_Node2D, (Vector2){-1., -1.});
 	/*Player* playerScript =*/ newPlayer(playerNode);
 #endif // NOT_IN_GAME_JAM / NOT_IN_CREAJAM3
 
     //game loop
-	cluigeRun();
+	cluige_run();
 
-//	wchar_t* t = L"└  ├";//;L"azerty";//// u"\u251c";//iCluige.checkedMalloc(88 * sizeof(wchar_t));
-//	wchar_t* l = L"";//      ░░░░▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓███";//;L"poiuytreza";////u"\u2514";//iCluige.checkedMalloc(88 * sizeof(wchar_t));
+//	wchar_t* t = L"└  ├";//;L"azerty";//// u"\u251c";//iCluige.checked_malloc(88 * sizeof(wchar_t));
+//	wchar_t* l = L"";//      ░░░░▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓███";//;L"poiuytreza";////u"\u2514";//iCluige.checked_malloc(88 * sizeof(wchar_t));
 ////  ├  └
 ////	wchar_t t[88];
 ////	wchar_t l[88];
@@ -660,38 +724,38 @@ int main()
 //	wprintf(L"%ls\n", l);
 
 	printf("Finishing...\n");
-    return cluigeFinish(); //TODO
+    return cluige_finish(); //TODO
 }
 
 
 /*  old tests
 
-	float* pf = iCluige.checkedMalloc(sizeof(float));
+	float* pf = iCluige.checked_malloc(sizeof(float));
 	(*pf) = 3.141592;
-	wprintf(L"test iCluige.checkedMalloc : %f\n", (*pf));
+	wprintf(L"test iCluige.checked_malloc : %f\n", (*pf));
 
 
 
-//	Variant varb = iCluige.iVariant.fromVal(VT_BOOL, true);
-//	Variant varc = iCluige.iVariant.fromVal(VT_CHAR, 'k');
-//	Variant vari32 = iCluige.iVariant.fromVal(VT_INT32, -49);
-//	Variant varui32 = iCluige.iVariant.fromVal(VT_UINT32, 3);
-//	Variant vari64 = iCluige.iVariant.fromVal(VT_INT64, -5000000000);
-//	Variant varui64 = iCluige.iVariant.fromVal(VT_UINT64, 5000000000);
-//	Variant varf = iCluige.iVariant.fromVal(VT_FLOAT, -49.3);
-//	Variant vard = iCluige.iVariant.fromVal(VT_DOUBLE, 3.14);
-//	Variant varptr = iCluige.iVariant.fromVal(VT_POINTER, &vard);
+//	Variant varb = iCluige.iVariant.from_val(VT_BOOL, true);
+//	Variant varc = iCluige.iVariant.from_val(VT_CHAR, 'k');
+//	Variant vari32 = iCluige.iVariant.from_val(VT_INT32, -49);
+//	Variant varui32 = iCluige.iVariant.from_val(VT_UINT32, 3);
+//	Variant vari64 = iCluige.iVariant.from_val(VT_INT64, -5000000000);
+//	Variant varui64 = iCluige.iVariant.from_val(VT_UINT64, 5000000000);
+//	Variant varf = iCluige.iVariant.from_val(VT_FLOAT, -49.3);
+//	Variant vard = iCluige.iVariant.from_val(VT_DOUBLE, 3.14);
+//	Variant varptr = iCluige.iVariant.from_val(VT_POINTER, &vard);
 //	Variant* vv = (Variant*)(varptr.ptr);
 //
-//	Variant vaarb = iCluige.iVariant.fromVal(VT_BOOL, false);
-//	Variant vaarc = iCluige.iVariant.fromVal(VT_CHAR, 'm');
-//	Variant vaari32 = iCluige.iVariant.fromVal(VT_INT32, -4);
-//	Variant vaarui32 = iCluige.iVariant.fromVal(VT_UINT32, 1);
-//	Variant vaari64 = iCluige.iVariant.fromVal(VT_INT64, -5000000001);
-//	Variant vaarui64 = iCluige.iVariant.fromVal(VT_UINT64, 5000000001);
-//	Variant vaarf = iCluige.iVariant.fromVal(VT_FLOAT, -19.1);
-//	Variant vaard = iCluige.iVariant.fromVal(VT_DOUBLE, 3.04);
-//	Variant vaarptr = iCluige.iVariant.fromVal(VT_POINTER, &vaard);
+//	Variant vaarb = iCluige.iVariant.from_val(VT_BOOL, false);
+//	Variant vaarc = iCluige.iVariant.from_val(VT_CHAR, 'm');
+//	Variant vaari32 = iCluige.iVariant.from_val(VT_INT32, -4);
+//	Variant vaarui32 = iCluige.iVariant.from_val(VT_UINT32, 1);
+//	Variant vaari64 = iCluige.iVariant.from_val(VT_INT64, -5000000001);
+//	Variant vaarui64 = iCluige.iVariant.from_val(VT_UINT64, 5000000001);
+//	Variant vaarf = iCluige.iVariant.from_val(VT_FLOAT, -19.1);
+//	Variant vaard = iCluige.iVariant.from_val(VT_DOUBLE, 3.04);
+//	Variant vaarptr = iCluige.iVariant.from_val(VT_POINTER, &vaard);
 //	int comp = iCluige.iVariant.compare(VT_BOOL, varb, vaarb);
 //	comp = iCluige.iVariant.compare(VT_CHAR, varc, vaarc);
 //	comp = iCluige.iVariant.compare(VT_INT32, vari32, vaari32);
@@ -709,63 +773,6 @@ int main()
 	free(formatheapTest);
 */
 
-#ifdef IN_GAME_JAM_CREAJAM1
-
-	//game jam 2023_02_04
-	Node2D* testUberRootNode2D = iCluige.iNode2D.newNode2D();
-	Node* myTestUberRootNode = testUberRootNode2D->_thisNode;
-	iCluige.iNode.setName(myTestUberRootNode, "test uber root");
-	iCluige.iNode2D.moveLocal(testUberRootNode2D, (Vector2){36., 40.});
-	iCluige.iNode.addChild(iCluige.publicRoot2D, myTestUberRootNode);
-
-	Node2D* myRootNode2D = iCluige.iNode2D.newNode2D();
-	Node* myRootNode = myRootNode2D->_thisNode;
-	iCluige.iNode.setName(myRootNode, "Game");
-	iCluige.iNode2D.moveLocal(myRootNode2D, (Vector2){10., 25.});
-	iCluige.iNode.addChild(/*iCluige.publicRoot2D*/myTestUberRootNode, myRootNode);
-
-	SpriteText* groundSpriteText = iCluige.iSpriteText.newSpriteText();
-	Node* groundNode = groundSpriteText->_thisNode2D->_thisNode;
-	iCluige.iNode.setName(groundNode, "Ground");
-	iCluige.iNode2D.moveLocal(groundSpriteText->_thisNode2D, (Vector2){0, 1});//11.5});//-8.5});//
-	iCluige.iNode.addChild(myRootNode, groundNode);
-	iCluige.iSpriteText.setText(groundSpriteText, "=================================================");
-
-
-	SpriteText* blockSpriteText = iCluige.iSpriteText.newSpriteText();
-	Node* blockNode = blockSpriteText->_thisNode2D->_thisNode;
-	iCluige.iNode.setName(blockNode, "Block");
-	blockSpriteText->offset = (Vector2){2, 1.5};//origin at center
-	iCluige.iNode2D.moveLocal(blockSpriteText->_thisNode2D, (Vector2){0., -2.5});//
-	iCluige.iNode.addChild(myRootNode, blockNode);
-
-	struct VaEtVient* blockScript = newVaEtVient(blockNode);
-	blockScript->ownerSprite = blockSpriteText;
-
-
-	SpriteText* playerSpriteText = iCluige.iSpriteText.newSpriteText();
-	Node* playerNode = playerSpriteText->_thisNode2D->_thisNode;
-	iCluige.iNode.setName(playerNode, "Player");
-	iCluige.iNode.addChild(myRootNode, playerNode);
-	iCluige.iSpriteText.setText(playerSpriteText, " o\n'U`\n \"   ");
-	playerSpriteText->offset = (Vector2){1, 2};//origin at feet of player
-	iCluige.iNode2D.moveLocal(playerSpriteText->_thisNode2D, (Vector2){25., 0.});
-	struct VaEtVientPlayer* playerScript = newVaEtVientPlayer(playerNode);
-	playerScript->ownerSprite = playerSpriteText;
-/*
-
- o        #####
-'U`       #   #
- "        #   #
-          #####
-
- */
-
-	//iCluige.wantedFrameSeconds = .1;
-	//iCluige.clock->scale = .6;
-	//iCluige.iNode.printTreePretty(iCluige.privateRoot2D);
-
-#endif // IN_GAME_JAM_CREAJAM1
 
 /*
 
