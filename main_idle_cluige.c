@@ -637,7 +637,7 @@ int main()
         iCluige.iStringBuilder.append(&sb_dq, "%.1f ", val);
     }
     iCluige.iStringBuilder.append(&sb_dq, "]");
-	iCluige.iDeque.delete_Deque(&dqTest);
+	iCluige.iDeque.pre_delete_Deque(&dqTest);
 	free(dqMsg);
 
 #endif // NOT_IN_GAME_JAM
