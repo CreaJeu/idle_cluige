@@ -28,7 +28,7 @@ static void vaEtVient_process(Script* this_Script, float elapsed_seconds)
     //mvaddstr(4, 7, display);
     #endif // PRE_CREAJAM2
 
-    static char* display = NULL;
+    //static char* display = NULL;
     static float bidon = 0;
     static Vector2 speed = (Vector2) { 15., 0.};
     static Vector2 depl;
