@@ -598,7 +598,7 @@ static void test_utils_str_from_parsed()
     }
 
     res = "a";
-	iCluige.iSortedDictionary.insert(&placeholder_dico, "test", "poiuytrez");
+	iCluige.iSortedDictionary.insert(&placeholder_dico, "test", "\"poiuytrez\"");
     utils_str_from_parsed(&res, &placeholder_dico, "test");
 	if(0 != strcmp(res, "poiuytrez"))
     {
@@ -606,7 +606,7 @@ static void test_utils_str_from_parsed()
     }
 
     res = "z";
-	iCluige.iSortedDictionary.insert(&placeholder_dico, "test", "azertyui");
+	iCluige.iSortedDictionary.insert(&placeholder_dico, "test", "\"azertyui\"");
     utils_str_from_parsed(&res, &placeholder_dico, "test");
 	if(0 != strcmp(res, "azertyui"))
     {
@@ -615,66 +615,105 @@ static void test_utils_str_from_parsed()
     iCluige.iSortedDictionary.pre_delete_SortedDictionary(&placeholder_dico);
 }
 
-static void test_Node_deserialize_dico()
+static void test_Node_instanciate()
 {
+	SortedDictionary* fcties = &(iCluige.iNode.node_factories);
+	Checked_Variant cv_fcty = iCluige.iSortedDictionary.get(fcties, "Node");
+	if(!(cv_fcty.valid))
+    {
+        printf("FAILED --- should be valid  | test_Node_instanciate 0\n ");
+    }
+    NodeFactory* fcty = (NodeFactory*)(cv_fcty.v.ptr);
+	if((fcty->instanciate) == NULL)
+    {
+        printf("FAILED --- should be a function  | test_Node_instanciate 1\n ");
+    }
 	SortedDictionary placeholder_dico;
     iCluige.iSortedDictionary.sorted_dictionary_alloc(&placeholder_dico, VT_POINTER, VT_POINTER, 3);
     iCluige.iSortedDictionary.set_compare_keys_func(&placeholder_dico, iCluige.iDeque.default_compare_string_func);
 
-    Node* res = iCluige.iNode.new_Node();
-    iCluige.iNode.deserialize_dico(res, &placeholder_dico);
+//    Node* res = iCluige.iNode.new_Node();
+//    iCluige.iNode.deserialize_dico(res, &placeholder_dico);
+    Node* res = fcty->instanciate(&placeholder_dico);
 
-    Node* res2 = iCluige.iNode.new_Node();
-	iCluige.iSortedDictionary.insert(&placeholder_dico, "name", "azertyuiop");
-    iCluige.iNode.deserialize_dico(res2, &placeholder_dico);
+    //Node* res2 = iCluige.iNode.new_Node();
+	iCluige.iSortedDictionary.insert(&placeholder_dico, "name", "\"azertyuiop\"");
+    //iCluige.iNode.deserialize_dico(res2, &placeholder_dico);
+    Node* res2 = fcty->instanciate(&placeholder_dico);
 	if(res2 == NULL || 0 != strcmp(res2->name, "azertyuiop"))
     {
-        printf("FAILED --- should be \"azertyuiop\"  | test_Node_deserialize_dico 1\n ");
+        printf("FAILED --- should be \"azertyuiop\"  | test_Node_instanciate 2\n ");
     }
     iCluige.iSortedDictionary.pre_delete_SortedDictionary(&placeholder_dico);
     res->delete_Node(res);//calls free(res);
     res2->delete_Node(res2);//calls free(res2);
 }
 
-static void test_Node2D_deserialize_dico()
+static void test_Node2D_instanciate()
 {
+	SortedDictionary* fcties = &(iCluige.iNode.node_factories);
+	Checked_Variant cv_fcty = iCluige.iSortedDictionary.get(fcties, "Node2D");
+	if(!(cv_fcty.valid))
+    {
+        printf("FAILED --- should be valid  | test_Node2D_instanciate 0\n ");
+    }
+    NodeFactory* fcty = (NodeFactory*)(cv_fcty.v.ptr);
+	if((fcty->instanciate) == NULL)
+    {
+        printf("FAILED --- should be a function  | test_Node2D_instanciate 1\n ");
+    }
+
 	SortedDictionary placeholder_dico;
     iCluige.iSortedDictionary.sorted_dictionary_alloc(&placeholder_dico, VT_POINTER, VT_POINTER, 3);
     iCluige.iSortedDictionary.set_compare_keys_func(&placeholder_dico, iCluige.iDeque.default_compare_string_func);
 
-    Node2D* res = iCluige.iNode2D.new_Node2D();
-    iCluige.iNode2D.deserialize_dico(res, &placeholder_dico);
+//    Node2D* res = iCluige.iNode2D.new_Node2D();
+//    iCluige.iNode2D.deserialize_dico(res, &placeholder_dico);
+    Node2D* res = (Node2D*)(fcty->instanciate(&placeholder_dico)->_sub_class);
     res->_this_Node->delete_Node(res->_this_Node);//calls free(res) and recursiv
 
-    Node2D* res2 = iCluige.iNode2D.new_Node2D();
 	iCluige.iSortedDictionary.insert(&placeholder_dico, "visible", "false");
 	iCluige.iSortedDictionary.insert(&placeholder_dico, "position", "Vector2(2.265, -3.2)");
-	iCluige.iSortedDictionary.insert(&placeholder_dico, "name", "a 1 23 4567890bcdefghijklmnopqrst");
-    iCluige.iNode2D.deserialize_dico(res2, &placeholder_dico);
+	iCluige.iSortedDictionary.insert(&placeholder_dico, "name", "\"a 1 23 4567890bcdefghijklmnopqrst\"");
+//    Node2D* res2 = iCluige.iNode2D.new_Node2D();
+//    iCluige.iNode2D.deserialize_dico(res2, &placeholder_dico);
+    Node2D* res2 = (Node2D*)(fcty->instanciate(&placeholder_dico)->_sub_class);
 	if(0 != strcmp(res2->_this_Node->name, "a 1 23 4567890bcdefghijklmnopqrst"))
     {
-        printf("FAILED --- should be \"a 1 23 4567890bcdefghijklmnopqrst\"  | test_Node2D_deserialize_dico 1\n ");
+        printf("FAILED --- should be \"a 1 23 4567890bcdefghijklmnopqrst\"  | test_Node2D_deserialize_dico 2\n ");
     }
 	if(res2->visible)
     {
-        printf("FAILED --- should be false  | test_Node2D_deserialize_dico 2\n ");
+        printf("FAILED --- should be false  | test_Node2D_deserialize_dico 3\n ");
     }
     float gap = fabs(res2->position.x - 2.265);
 	if(gap > .0001)
     {
-        printf("FAILED --- should be 2.265  | test_Node2D_deserialize_dico 3\n ");
+        printf("FAILED --- should be 2.265  | test_Node2D_deserialize_dico 4\n ");
     }
     gap = fabs(res2->position.y - -3.2);
 	if(gap > .0001)
     {
-        printf("FAILED --- should be -3.2  | test_Node2D_deserialize_dico 4\n ");
+        printf("FAILED --- should be -3.2  | test_Node2D_deserialize_dico 5\n ");
     }
     iCluige.iSortedDictionary.pre_delete_SortedDictionary(&placeholder_dico);
     res2->_this_Node->delete_Node(res2->_this_Node);//calls free(res2) and recursiv
 }
 
-static void test_SpriteText_deserialize_dico()
+static void test_SpriteText_instanciate()
 {
+	SortedDictionary* fcties = &(iCluige.iNode.node_factories);
+	Checked_Variant cv_fcty = iCluige.iSortedDictionary.get(fcties, "SpriteText");
+	if(!(cv_fcty.valid))
+    {
+        printf("FAILED --- SpriteText not in factories  | test_SpriteText_instanciate 0\n ");
+    }
+    NodeFactory* fcty = (NodeFactory*)(cv_fcty.v.ptr);
+	if((fcty->instanciate) == NULL)
+    {
+        printf("FAILED --- uninitialized SpriteText factory function  | test_SpriteText_instanciate 1\n ");
+    }
+
 	SortedDictionary placeholder_dico;
     iCluige.iSortedDictionary.sorted_dictionary_alloc(&placeholder_dico, VT_POINTER, VT_POINTER, 4);
     iCluige.iSortedDictionary.set_compare_keys_func(&placeholder_dico, iCluige.iDeque.default_compare_string_func);
@@ -684,52 +723,67 @@ static void test_SpriteText_deserialize_dico()
 //    iCluige.iSpriteText.deserialize_dico(res, &placeholder_dico);
 //    res->_this_Node2D->_this_Node->delete_Node(res->_this_Node2D->_this_Node);//calls free(res) and recursiv
 
-    SpriteText* res2 = iCluige.iSpriteText.new_SpriteText();
 	iCluige.iSortedDictionary.insert(&placeholder_dico, "aaaaaaaaaa", "fake to test");
-	iCluige.iSortedDictionary.insert(&placeholder_dico, "text", "un essai\n de texte\n\nmultiligne");
+	iCluige.iSortedDictionary.insert(&placeholder_dico, "text", "\"un es\"sai\n de te\"xte\n\nmultiligne\"");
 	iCluige.iSortedDictionary.insert(&placeholder_dico, "offset", "Vector2(-49.3, 42)");
 	iCluige.iSortedDictionary.insert(&placeholder_dico, "visible", "false");
 	iCluige.iSortedDictionary.insert(&placeholder_dico, "position", "Vector2(2.265, -3.2)");
-	iCluige.iSortedDictionary.insert(&placeholder_dico, "name", "a sprite text");
-    iCluige.iSpriteText.deserialize_dico(res2, &placeholder_dico);
+	iCluige.iSortedDictionary.insert(&placeholder_dico, "name", "\"a sprite text\"");
+//    SpriteText* res2 = iCluige.iSpriteText.new_SpriteText();
+    //iCluige.iSpriteText.deserialize_dico(res2, &placeholder_dico);
+    Node* res2_n = fcty->instanciate(&placeholder_dico);
+    Node2D* res2_n2d = (Node2D*)(res2_n->_sub_class);
+    SpriteText* res2 = (SpriteText*)(res2_n2d->_sub_class);
 	if(0 != strcmp(res2->_this_Node2D->_this_Node->name, "a sprite text"))
     {
-        printf("FAILED --- should be \"a sprite text\"  | test_SpriteText_deserialize_dico 1\n ");
+        printf("FAILED --- should be \"a sprite text\"  | test_SpriteText_instanciate 2\n ");
     }
 	if(res2->_this_Node2D->visible)
     {
-        printf("FAILED --- should be false  | test_SpriteText_deserialize_dico 2\n ");
+        printf("FAILED --- should be false  | test_SpriteText_instanciate 3\n ");
     }
     float gap = fabs(res2->_this_Node2D->position.x - 2.265);
 	if(gap > .0001)
     {
-        printf("FAILED --- should be 2.265  | test_SpriteText_deserialize_dico 3\n ");
+        printf("FAILED --- should be 2.265  | test_SpriteText_instanciate 4\n ");
     }
     gap = fabs(res2->_this_Node2D->position.y - -3.2);
 	if(gap > .0001)
     {
-        printf("FAILED --- should be -3.2  | test_SpriteText_deserialize_dico 4\n ");
+        printf("FAILED --- should be -3.2  | test_SpriteText_instanciate 5\n ");
     }
     gap = fabs(res2->offset.x - -49.3);
 	if(gap > .0001)
     {
-        printf("FAILED --- should be -49.3  | test_SpriteText_deserialize_dico 5\n ");
+        printf("FAILED --- should be -49.3  | test_SpriteText_instanciate 6\n ");
     }
     gap = fabs(res2->offset.y - 42);
 	if(gap > .0001)
     {
-        printf("FAILED --- should be 42  | test_SpriteText_deserialize_dico 6\n ");
+        printf("FAILED --- should be 42  | test_SpriteText_instanciate 7\n ");
     }
-	if(0 != strcmp(res2->text, "un essai\0 de texte\0\0multiligne"))
+	if(0 != strcmp(res2->text, "un es\"sai\0 de te\"xte\0\0multiligne"))
     {
-        printf("FAILED --- should be \"un essai...\"  | test_SpriteText_deserialize_dico 1\n ");
+        printf("FAILED --- should be \"un es\"sai...\"  | test_SpriteText_instanciate 8\n ");
     }
     iCluige.iSortedDictionary.pre_delete_SortedDictionary(&placeholder_dico);
     res2->_this_Node2D->_this_Node->delete_Node(res2->_this_Node2D->_this_Node);//calls free(res2) and recursiv
 }
 
-static void test_SpriteSVG_deserialize_dico()
+static void test_SpriteSVG_instanciate()
 {
+	SortedDictionary* fcties = &(iCluige.iNode.node_factories);
+	Checked_Variant cv_fcty = iCluige.iSortedDictionary.get(fcties, "SpriteSVG");
+	if(!(cv_fcty.valid))
+    {
+        printf("FAILED --- SpriteSVG not in factories  | test_SpriteSVG_instanciate\n ");
+    }
+    NodeFactory* fcty = (NodeFactory*)(cv_fcty.v.ptr);
+	if((fcty->instanciate) == NULL)
+    {
+        printf("FAILED --- uninitialized SpriteSVG factory function  | test_SpriteSVG_instanciate\n ");
+    }
+
 	SortedDictionary placeholder_dico;
     iCluige.iSortedDictionary.sorted_dictionary_alloc(&placeholder_dico, VT_POINTER, VT_POINTER, 7);
     iCluige.iSortedDictionary.set_compare_keys_func(&placeholder_dico, iCluige.iDeque.default_compare_string_func);
@@ -739,52 +793,56 @@ static void test_SpriteSVG_deserialize_dico()
 //    iCluige.iSpriteSVG.deserialize_dico(res, &placeholder_dico);
 //    res->_this_Node2D->_this_Node->delete_Node(res->_this_Node2D->_this_Node);//calls free(res) and recursiv
 
-    SpriteSVG* res2 = iCluige.iSpriteSVG.new_SpriteSVG();
 	iCluige.iSortedDictionary.insert(&placeholder_dico, "scale", "Vector2(-1.45, .66)");
 	iCluige.iSortedDictionary.insert(&placeholder_dico, "zzzzzz", "fake to test");
-	iCluige.iSortedDictionary.insert(&placeholder_dico, "svg_file_path", "./stunjam2023eyes.svg");
+	iCluige.iSortedDictionary.insert(&placeholder_dico, "svg_file_path", "\"./stunjam2023eyes.svg\"");
 	iCluige.iSortedDictionary.insert(&placeholder_dico, "offset", "Vector2(-49.3, 42)");
-	iCluige.iSortedDictionary.insert(&placeholder_dico, "name", "a sprite svg");
+	iCluige.iSortedDictionary.insert(&placeholder_dico, "name", "\"a sprite svg\"");
 	iCluige.iSortedDictionary.insert(&placeholder_dico, "visible", "false");
 	iCluige.iSortedDictionary.insert(&placeholder_dico, "position", "Vector2(2.265, -3.2)");
-    iCluige.iSpriteSVG.deserialize_dico(res2, &placeholder_dico);
+//    SpriteSVG* res2 = iCluige.iSpriteSVG.new_SpriteSVG();
+//    iCluige.iSpriteSVG.deserialize_dico(res2, &placeholder_dico);
+    Node* res2_n = fcty->instanciate(&placeholder_dico);
+    Node2D* res2_n2d = (Node2D*)(res2_n->_sub_class);
+    SpriteSVG* res2 = (SpriteSVG*)(res2_n2d->_sub_class);
+    //SpriteSVG* res2 = (SpriteSVG*)(fcty->instanciate(&placeholder_dico)->_sub_class);
 	if(0 != strcmp(res2->_this_Node2D->_this_Node->name, "a sprite svg"))
     {
-        printf("FAILED --- should be \"a sprite svg\"  | test_SpriteSVG_deserialize_dico 1\n ");
+        printf("FAILED --- should be \"a sprite svg\"  | test_SpriteSVG_instanciate 1\n ");
     }
 	if(res2->_this_Node2D->visible)
     {
-        printf("FAILED --- should be false  | test_SpriteSVG_deserialize_dico 2\n ");
+        printf("FAILED --- should be false  | test_SpriteSVG_instanciate 2\n ");
     }
     float gap = fabs(res2->_this_Node2D->position.x - 2.265);
 	if(gap > .0001)
     {
-        printf("FAILED --- should be 2.265  | test_SpriteSVG_deserialize_dico 3\n ");
+        printf("FAILED --- should be 2.265  | test_SpriteSVG_instanciate 3\n ");
     }
     gap = fabs(res2->_this_Node2D->position.y - -3.2);
 	if(gap > .0001)
     {
-        printf("FAILED --- should be -3.2  | test_SpriteSVG_deserialize_dico 4\n ");
+        printf("FAILED --- should be -3.2  | test_SpriteSVG_instanciate 4\n ");
     }
     gap = fabs(res2->offset.x - -49.3);
 	if(gap > .0001)
     {
-        printf("FAILED --- should be -49.3  | test_SpriteSVG_deserialize_dico 5\n ");
+        printf("FAILED --- should be -49.3  | test_SpriteSVG_instanciate 5\n ");
     }
     gap = fabs(res2->offset.y - 42);
 	if(gap > .0001)
     {
-        printf("FAILED --- should be 42  | test_SpriteSVG_deserialize_dico 6\n ");
+        printf("FAILED --- should be 42  | test_SpriteSVG_instanciate 6\n ");
     }
     gap = fabs(res2->scale.x - -1.45);
 	if(gap > .0001)
     {
-        printf("FAILED --- should be -1.45  | test_SpriteSVG_deserialize_dico 7\n ");
+        printf("FAILED --- should be -1.45  | test_SpriteSVG_instanciate 7\n ");
     }
     gap = fabs(res2->scale.y - .66);
 	if(gap > .0001)
     {
-        printf("FAILED --- should be .66  | test_SpriteSVG_deserialize_dico 8\n ");
+        printf("FAILED --- should be .66  | test_SpriteSVG_instanciate 8\n ");
     }
     Path2D* path = (Path2D*)(iCluige.iDeque.at(&(res2->paths), 0).ptr);
     Vector2* point0 = (Vector2*)(iCluige.iDeque.at(&(path->_points), 0).ptr);
@@ -805,17 +863,21 @@ int main()
     test_utils_bool_from_parsed();
     test_utils_char_from_parsed();
     test_utils_str_from_parsed();
-    test_Node_deserialize_dico();
-    test_Node2D_deserialize_dico();
-    test_SpriteText_deserialize_dico();
-    test_SpriteSVG_deserialize_dico();
+    test_Node_instanciate();
+    test_Node2D_instanciate();
+    test_SpriteText_instanciate();
+    test_SpriteSVG_instanciate();
 
 	SortedDictionary parse_placeholder;
     iCluige.iSortedDictionary.sorted_dictionary_alloc(&parse_placeholder, VT_POINTER, VT_POINTER, 10);
     iCluige.iSortedDictionary.set_compare_keys_func(&parse_placeholder, iCluige.iDeque.default_compare_string_func);
 	iCluige.iSortedDictionary.insert(&parse_placeholder, "name", "O_Racine");
-	Node* my_root = iCluige.iNode.new_Node();
-	iCluige.iNode.deserialize_dico(my_root, &parse_placeholder);
+//	Node* my_root = iCluige.iNode.new_Node();
+//	iCluige.iNode.deserialize_dico(my_root, &parse_placeholder);
+	SortedDictionary* fcties = &(iCluige.iNode.node_factories);
+	Checked_Variant cv_fcty = iCluige.iSortedDictionary.get(fcties, "Node");
+    NodeFactory* fcty = (NodeFactory*)(cv_fcty.v.ptr);
+    Node* my_root = fcty->instanciate(&parse_placeholder);
 	utils_breakpoint_trick(my_root, false);
 
 #ifdef IN_GLOBALGAMEJAM2024
