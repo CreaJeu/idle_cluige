@@ -846,10 +846,83 @@ static void test_SpriteSVG_instanciate()
     }
     Path2D* path = (Path2D*)(iCluige.iDeque.at(&(res2->paths), 0).ptr);
     Vector2* point0 = (Vector2*)(iCluige.iDeque.at(&(path->_points), 0).ptr);
-    utils_breakpoint_trick(point0, true);
+    utils_breakpoint_trick(point0, false);
 
     iCluige.iSortedDictionary.pre_delete_SortedDictionary(&placeholder_dico);
     res2->_this_Node2D->_this_Node->delete_Node(res2->_this_Node2D->_this_Node);//calls free(res2) and recursiv
+}
+
+static void test_TscnParser()
+{
+	TscnParser parser;
+	iCluige.iTscnParser.tscn_parser_alloc(&parser, "test_tscn_parser.tscn");
+	bool ok = true;
+	char* dbg = 00;
+	while(!feof(parser._file))
+	{
+		ok = parser.node(&parser);
+//		if(ok)
+//		{
+//			dbg = iCluige.iPackedScene.debug(parser._current_packed_scene);
+//			printf("%s\n\n", dbg);
+//		}
+		//free(dbg); but osef test
+	}
+	dbg = iCluige.iPackedScene.debug_recrusive(parser.scene_root, NULL);
+	printf("%s\n\n", dbg);
+	utils_breakpoint_trick(dbg, true);
+#ifdef NAN_RIEN_DEJA_TESTED
+	char* key = 00;
+	char* val = 00;
+	while(!feof(parser._file))
+	{
+		ok = parser.param(&parser);
+		key = parser._current_param;
+		val = parser._current_value;
+	}
+
+	bool ok = parser.value(&parser);
+	char* val = parser._current_value;
+	ok = parser.value(&parser);
+	val = parser._current_value;
+	ok = parser.value(&parser);
+	val = parser._current_value;
+	ok = parser.value(&parser);
+	val = parser._current_value;
+	ok = parser.value(&parser);
+	val = parser._current_value;
+	ok = parser.value(&parser);
+	val = parser._current_value;
+	ok = parser.value(&parser);
+	val = parser._current_value;
+	ok = parser.value(&parser);
+	val = parser._current_value;
+	ok = parser.value(&parser);
+	val = parser._current_value;
+	utils_breakpoint_trick(&val, true);
+//			bool ok = parser.read_line(&parser);
+//	char* readln = parser._current_line;
+//	printf(readln);
+//	utils_breakpoint_trick(readln, false);
+//	ok = parser.is_ending_quote(&parser);
+//	utils_breakpoint_trick(&ok, false);
+//			ok = parser.read_line(&parser);
+//	readln = parser._current_line;
+//	printf(readln);
+//	int allocated_chars = parser._current_line_capacity;
+//	utils_breakpoint_trick(&allocated_chars, false);
+//	ok = parser.is_ending_quote(&parser);
+//	utils_breakpoint_trick(&ok, false);
+//			ok = parser.read_line(&parser);
+//	readln = parser._current_line;
+//	ok = parser.is_ending_quote(&parser);
+#endif
+
+	iCluige.iTscnParser.pre_delete_TscnParser(&parser);
+//	if(!(cv_fcty.valid))
+//    {
+//        printf("FAILED --- SpriteText not in factories  | test_SpriteText_instanciate 0\n ");
+//    }
 }
 
 int main()
@@ -867,6 +940,7 @@ int main()
     test_Node2D_instanciate();
     test_SpriteText_instanciate();
     test_SpriteSVG_instanciate();
+    test_TscnParser();
 
 	SortedDictionary parse_placeholder;
     iCluige.iSortedDictionary.sorted_dictionary_alloc(&parse_placeholder, VT_POINTER, VT_POINTER, 10);
