@@ -852,77 +852,93 @@ static void test_SpriteSVG_instanciate()
     res2->_this_Node2D->_this_Node->delete_Node(res2->_this_Node2D->_this_Node);//calls free(res2) and recursiv
 }
 
+static void test_FileLineReader()
+{
+	FileLineReader flr;
+	iCluige.iFileLineReader.fileLineReader_alloc(&flr, 100);
+	bool ok = iCluige.iFileLineReader.open_file_start_reader(&flr, "no");
+	if(ok)
+	{
+		printf("FAILED --- should be flase  | test_FileLineReader 1\n ");
+	}
+	ok = iCluige.iFileLineReader.open_file_start_reader(&flr, "test_corbeau.txt");
+	if(!ok)
+	{
+		printf("FAILED --- should be true  | test_FileLineReader 2\n ");
+	}
+	ok = iCluige.iFileLineReader.feof(&flr, 0);
+	if(ok)
+	{
+		printf("FAILED --- should be flase  | test_FileLineReader 3\n ");
+	}
+	const char* line = iCluige.iFileLineReader.get_line(&flr, 0);
+	if(strcmp("Maître corbeau, sur un arbre perché,\n", line))
+	{
+		printf("FAILED --- should be \"Maître corbeau, sur un arbre perché,\n\"  | test_FileLineReader 4\n ");
+	}
+	//printf(line);
+	int i = 1;
+	while(!iCluige.iFileLineReader.feof(&flr, i))
+	{
+		line = iCluige.iFileLineReader.get_line(&flr, i);
+		//printf(line);
+		i++;
+	}
+	iCluige.iFileLineReader.forget_lines_before(&flr, i-3);//line # i is preserved
+	//line = iCluige.iFileLineReader.get_line(&flr, i-4);//must assert
+	//printf("\n-------------\n");
+	for(int c = i-3; c < i; c++)
+	{
+		line = iCluige.iFileLineReader.get_line(&flr, c);
+		//printf(line);
+	}
+	line = iCluige.iFileLineReader.get_line(&flr, i+1);
+	if(line != NULL)
+	{
+		printf("FAILED --- should be NULL  | test_FileLineReader 5\n ");
+	}
+	line = iCluige.iFileLineReader.get_line(&flr, i+2);
+	if(line != NULL)
+	{
+		printf("FAILED --- should be NULL  | test_FileLineReader 5.2\n ");
+	}
+	iCluige.iFileLineReader.close_file(&flr);
+
+	//other file
+	//printf("\n++++++++++++++++\n");
+	ok = iCluige.iFileLineReader.open_file_start_reader(&flr, "azerty.tscn");//"test_tscn_parser.tscn");//
+	if(!ok)
+	{
+		printf("FAILED --- should be true  | test_FileLineReader 6\n ");
+	}
+	i = 0;
+	while(!iCluige.iFileLineReader.feof(&flr, i))
+	{
+		line = iCluige.iFileLineReader.get_line(&flr, i);
+		//printf(line);
+		iCluige.iFileLineReader.forget_lines_before(&flr, i);
+		i++;
+	}
+	iCluige.iFileLineReader.close_file(&flr);
+	iCluige.iFileLineReader.pre_delete_FileLineReader(&flr);
+	//printf("\n end FileLineReader test \n");
+}
+
 static void test_TscnParser()
 {
 	TscnParser parser;
-	iCluige.iTscnParser.tscn_parser_alloc(&parser, "test_tscn_parser.tscn");
-	bool ok = true;
-	char* dbg = 00;
-	while(!feof(parser._file))
-	{
-		ok = parser.node(&parser);
-//		if(ok)
-//		{
-//			dbg = iCluige.iPackedScene.debug(parser._current_packed_scene);
-//			printf("%s\n\n", dbg);
-//		}
-		//free(dbg); but osef test
-	}
-	dbg = iCluige.iPackedScene.debug_recrusive(parser.scene_root, NULL);
+	iCluige.iTscnParser.tscn_parser_alloc(&parser, "test_tscn_parser.tscn");//"azerty.tscn");//"main.tscn = avec instanced = todo later");//
+//	bool ok = parser.read_line(&parser);
+//	ok = parser.read_line(&parser);
+//	ok = parser.ignore_non_node(&parser);
+//	ok = parser.node(&parser);
+//	ok = parser.node(&parser);
+	bool ok = parser.parse_scene(&parser);
+	char* dbg = iCluige.iPackedScene.debug_recrusive(parser.scene_root, NULL);
 	printf("%s\n\n", dbg);
-	utils_breakpoint_trick(dbg, true);
-#ifdef NAN_RIEN_DEJA_TESTED
-	char* key = 00;
-	char* val = 00;
-	while(!feof(parser._file))
-	{
-		ok = parser.param(&parser);
-		key = parser._current_param;
-		val = parser._current_value;
-	}
-
-	bool ok = parser.value(&parser);
-	char* val = parser._current_value;
-	ok = parser.value(&parser);
-	val = parser._current_value;
-	ok = parser.value(&parser);
-	val = parser._current_value;
-	ok = parser.value(&parser);
-	val = parser._current_value;
-	ok = parser.value(&parser);
-	val = parser._current_value;
-	ok = parser.value(&parser);
-	val = parser._current_value;
-	ok = parser.value(&parser);
-	val = parser._current_value;
-	ok = parser.value(&parser);
-	val = parser._current_value;
-	ok = parser.value(&parser);
-	val = parser._current_value;
-	utils_breakpoint_trick(&val, true);
-//			bool ok = parser.read_line(&parser);
-//	char* readln = parser._current_line;
-//	printf(readln);
-//	utils_breakpoint_trick(readln, false);
-//	ok = parser.is_ending_quote(&parser);
-//	utils_breakpoint_trick(&ok, false);
-//			ok = parser.read_line(&parser);
-//	readln = parser._current_line;
-//	printf(readln);
-//	int allocated_chars = parser._current_line_capacity;
-//	utils_breakpoint_trick(&allocated_chars, false);
-//	ok = parser.is_ending_quote(&parser);
-//	utils_breakpoint_trick(&ok, false);
-//			ok = parser.read_line(&parser);
-//	readln = parser._current_line;
-//	ok = parser.is_ending_quote(&parser);
-#endif
-
+	utils_breakpoint_trick(&ok, false);
+	utils_breakpoint_trick(dbg, false);
 	iCluige.iTscnParser.pre_delete_TscnParser(&parser);
-//	if(!(cv_fcty.valid))
-//    {
-//        printf("FAILED --- SpriteText not in factories  | test_SpriteText_instanciate 0\n ");
-//    }
 }
 
 int main()
@@ -933,14 +949,15 @@ int main()
     //init
 	cluige_init();//makes all roots, set all functions pointers, etc.
 
-    test_utils_bool_from_parsed();
-    test_utils_char_from_parsed();
-    test_utils_str_from_parsed();
-    test_Node_instanciate();
-    test_Node2D_instanciate();
-    test_SpriteText_instanciate();
-    test_SpriteSVG_instanciate();
-    test_TscnParser();
+	test_utils_bool_from_parsed();
+	test_utils_char_from_parsed();
+	test_utils_str_from_parsed();
+	test_Node_instanciate();
+	test_Node2D_instanciate();
+	test_SpriteText_instanciate();
+	test_SpriteSVG_instanciate();
+	test_FileLineReader();
+	test_TscnParser();
 
 	SortedDictionary parse_placeholder;
     iCluige.iSortedDictionary.sorted_dictionary_alloc(&parse_placeholder, VT_POINTER, VT_POINTER, 10);
