@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://c1mb64a87dpkw"]
+
+[ext_resource type="PackedScene" uid="uid://br0ysg5vf5xrh" path="res://un_prefab_node_2d.tscn" id="1_hl8su"]
+[ext_resource type="Script" path="res://un_prefab_node_2d.gd" id="2_nq83x"]
+
+[node name="proot" type="Node2D"]
+
+[node name="inst prefab Node2D" parent="." node_paths=PackedStringArray("_un_lien_vers_un_node2D") instance=ExtResource("1_hl8su")]
+script = ExtResource("2_nq83x")
+_un_lien_vers_un_node2D = NodePath("..")

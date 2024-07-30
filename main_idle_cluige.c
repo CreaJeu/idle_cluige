@@ -927,7 +927,7 @@ static void test_FileLineReader()
 static void test_TscnParser()
 {
 	TscnParser parser;
-	iCluige.iTscnParser.tscn_parser_alloc(&parser, "test_tscn_parser.tscn");//"azerty.tscn");//"main.tscn = avec instanced = todo later");//
+	iCluige.iTscnParser.tscn_parser_alloc(&parser, "azerty.tscn");//"autre_instancieur.tscn");//"test_tscn_parser.tscn");//"main.tscn = avec instanced = todo later");//
 //	bool ok = parser.read_line(&parser);
 //	ok = parser.read_line(&parser);
 //	ok = parser.ignore_non_node(&parser);
