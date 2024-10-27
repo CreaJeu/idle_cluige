@@ -14,7 +14,8 @@
 //#define IN_GAME_JAM_CREAJAM2
 //#define IN_CREAJAM3
 //#define IN_STUNJAM2023
-#define IN_GLOBALGAMEJAM2024
+//#define IN_GLOBALGAMEJAM2024
+#define IN_OCTOJAM_2024
 
 #ifdef IN_CREAJAM3
 #include <../PDCurses/curses.h>
@@ -1140,6 +1141,83 @@ static void test_pksc_instanciate()
 	iCluige.iTscnParser.pre_delete_TscnParser(&parser);
 }
 
+#ifdef IN_OCTOJAM_2024
+
+int RIGHT_ACTION;
+int LEFT_ACTION;
+int UP_ACTION;
+int DOWN_ACTION;
+int QUIT_ACTION;
+
+Script* player_script;
+Node2D* player_node2D;
+Script* mystere_script;
+float player_speed;
+float min_dist;
+float max_dist;
+
+void delete_mystere(Script* this_Script)
+{//maybe one day
+}
+
+static void process_mystere(Script* this_Script, float elapsed_seconds)
+{
+	Node2D* this_node2D = (Node2D*)(this_Script->node->_sub_class);
+	float d = iCluige.iVector2.distance_to(
+			&(this_node2D->position),
+			&(player_node2D->position));
+	d = clamp_float(d, min_dist, max_dist);
+	float s = 10 / d;
+	SpriteSVG* this_spriteSVG = (SpriteSVG*)(this_node2D->_sub_class);
+	this_spriteSVG->scale.x = s;
+	this_spriteSVG->scale.y = s;
+}
+
+void delete_player(Script* this_Script)
+{//maybe one day
+}
+
+static void process_Player(Script* this_Script, float elapsed_seconds)
+{
+//    struct _Input* ii = iCluige.input;
+	struct iiInput* iii = &iCluige.iInput;
+
+	if(iii->is_action_just_pressed(QUIT_ACTION))
+	{
+		iCluige.quit_asked = true;
+		return;
+	}
+
+	float dx = 0;
+	float dy = 0;
+	if(iii->is_action_just_pressed(UP_ACTION))
+	{
+		dy -= 1;
+	}
+	if(iii->is_action_just_pressed(DOWN_ACTION))
+	{
+		dy += 1;
+	}
+	if(iii->is_action_just_pressed(LEFT_ACTION))
+	{
+		dx -= 1;
+	}
+	if(iii->is_action_just_pressed(RIGHT_ACTION))
+	{
+		dx += 1;
+	}
+	Vector2 d = (Vector2)
+	{
+		elapsed_seconds * player_speed * dx,
+		elapsed_seconds * player_speed * dy
+	};
+
+	iCluige.iNode2D.move_local(player_node2D, d);
+}
+
+
+#endif // IN_OCTOJAM_2024
+
 int main()
 {
 //    jandk(0, 49, 3);
@@ -1148,6 +1226,7 @@ int main()
 	//init
 	cluige_init();//makes all roots, set all functions pointers, etc.
 
+#ifdef TMP_TEST_TO_PUT_IN_TEST_PROJECT
 	test_utils_bool_from_parsed();
 	test_utils_char_from_parsed();
 	test_utils_str_from_parsed();
@@ -1170,6 +1249,7 @@ int main()
 	NodeFactory* fcty = (NodeFactory*)(cv_fcty.v.ptr);
 	Node* my_root = fcty->instanciate(&parse_placeholder);
 	utils_breakpoint_trick(my_root, false);
+#endif // TMP_TEST_TO_PUT_IN_TEST_PROJECT
 
 #ifdef IN_GLOBALGAMEJAM2024
     SortedDictionary d;
@@ -1269,6 +1349,88 @@ int main()
 //
 //    iCluige.iDeque.pre_delete_Deque(&d);
 #endif // IN_GLOBALGAMEJAM2024
+
+#ifdef IN_OCTOJAM_2024
+	UP_ACTION = iCluige.iInput.add_action("up");
+    iCluige.iInput.bind_key(UP_ACTION, 'e');
+    iCluige.iInput.bind_key(UP_ACTION, 'E');
+//    iCluige.iInput.bind_key(UP_ACTION, KEY_UP);
+
+	DOWN_ACTION = iCluige.iInput.add_action("down");
+    iCluige.iInput.bind_key(DOWN_ACTION, 'd');
+    iCluige.iInput.bind_key(DOWN_ACTION, 'D');
+//    iCluige.iInput.bind_key(DOWN_ACTION, KEY_DOWN);
+
+	LEFT_ACTION = iCluige.iInput.add_action("left");
+    iCluige.iInput.bind_key(LEFT_ACTION, 's');
+    iCluige.iInput.bind_key(LEFT_ACTION, 'S');
+//    iCluige.iInput.bind_key(LEFT_ACTION, KEY_LEFT);
+
+	RIGHT_ACTION = iCluige.iInput.add_action("right");
+    iCluige.iInput.bind_key(RIGHT_ACTION, 'f');
+    iCluige.iInput.bind_key(RIGHT_ACTION, 'F');
+//    iCluige.iInput.bind_key(RIGHT_ACTION, KEY_RIGHT);
+
+	QUIT_ACTION = iCluige.iInput.add_action("quit");
+    iCluige.iInput.bind_key(QUIT_ACTION, 'x');
+    iCluige.iInput.bind_key(QUIT_ACTION, 'X');
+
+	TscnParser parser;
+	iCluige.iTscnParser.tscn_parser_alloc(&parser, "octojam_24.tscn");
+	bool ok = parser.parse_scene(&parser);
+	utils_breakpoint_trick(&ok, !ok);
+//	char* dbg = iCluige.iPackedScene.debug_recrusive(parser.scene_root, NULL);
+	PackedScene* ps = parser.scene_root;
+	Node* my_game_root_node = iCluige.iPackedScene.instanciate(ps);
+	iCluige.iNode.add_child(iCluige.public_root_2D, my_game_root_node);
+
+
+	Node* player_node = iCluige.iNode.get_node(my_game_root_node, "player_Sprite2D");
+	player_node2D = (Node2D*)(player_node->_sub_class);
+	Script* new_Script = iCluige.iScript.new_Script(player_node);
+	new_Script->node = player_node;
+	new_Script->delete_Script = delete_player;
+	new_Script->process = process_Player;
+	new_Script->_sub_class = NULL;
+	player_node->script = new_Script;
+	player_speed = 300;
+
+	min_dist = 15;
+	max_dist = 1000;
+	Node* mystere_node = player_node->next_sibling;
+	while(mystere_node != NULL)
+	{
+//		Node2D* mystere_node2D = (Node2D*)(mystere_node->_sub_class);
+//		SpriteSVG* mystere_SpriteSVG = (SpriteSVG*)(mystere_node2D->_sub_class);
+		Script* mystere_Script = iCluige.iScript.new_Script(mystere_node);
+		mystere_Script->node = mystere_node;
+		mystere_Script->delete_Script = delete_mystere;
+		mystere_Script->process = process_mystere;
+		mystere_Script->_sub_class = NULL;
+		mystere_node->script = mystere_Script;
+
+		mystere_node = mystere_node->next_sibling;
+	}
+
+//	SpriteSVG* essai_sprtSVG = iCluige.iSpriteSVG.new_SpriteSVG();
+//	Node2D* essai_sprtSVG_node2D = (Node2D*)(essai_sprtSVG->_this_Node2D);
+//	Node* essai_sprtSVG_node = (Node*)(essai_sprtSVG_node2D->_this_Node);
+//	iCluige.iNode.add_child(iCluige.public_root_2D, essai_sprtSVG_node);
+//	iCluige.iNode2D.move_local(essai_sprtSVG_node2D, (Vector2){ 2.f, 2.f });
+//	iCluige.iSpriteSVG.parse_file(essai_sprtSVG, "question.svg");
+//	essai_sprtSVG->scale = (Vector2){ .1f, .1f };
+
+	iCluige.iCamera2D.set_zoom(iCluige.iCamera2D.current_camera,
+				(Vector2){.23f, .23f});
+	Node2D* camera_n2D = iCluige.iCamera2D.current_camera->_this_Node2D;
+	iCluige.iNode2D.move_local(camera_n2D, (Vector2){ 460.f, 220.f });
+//	iCluige.iNode.print_tree_pretty(iCluige.public_root_2D);
+
+	iCluige.iPackedScene.pre_delete_PackedScene(ps);
+	iCluige.iTscnParser.pre_delete_TscnParser(&parser);
+
+	cluige_run();
+#endif // IN_GAME_JAM_CREAJAM2
 
 #ifdef IN_GAME_JAM_CREAJAM2
 
@@ -1522,7 +1684,7 @@ int main()
 #endif // NOT_IN_GAME_JAM / NOT_IN_CREAJAM3
 
     //game loop
-	//////////////////////////////////////cluige_run();
+	//cluige_run();
 
 //	wchar_t* t = L"└  ├";//;L"azerty";//// u"\u251c";//iCluige.checked_malloc(88 * sizeof(wchar_t));
 //	wchar_t* l = L"";//      ░░░░▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓███";//;L"poiuytreza";////u"\u2514";//iCluige.checked_malloc(88 * sizeof(wchar_t));
