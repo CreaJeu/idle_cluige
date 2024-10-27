@@ -1152,7 +1152,9 @@ int QUIT_ACTION;
 Script* player_script;
 Node2D* player_node2D;
 Script* mystere_script;
-float player_speed;
+Vector2 player_speed;
+float player_speed_max;
+float player_brake;//acceleration
 float min_dist;
 float max_dist;
 
@@ -1206,10 +1208,49 @@ static void process_Player(Script* this_Script, float elapsed_seconds)
 	{
 		dx += 1;
 	}
+	float epsilon_speed = 9;
+	//<<<<<<<<<  xxxxxxxxx
+	if(fabs(dx) == 0)
+	{
+		if(fabs(player_speed.x) < epsilon_speed)
+		{
+			player_speed.x = 0;
+		}
+		else
+		{
+			float ds = - copysignf(elapsed_seconds * player_brake, player_speed.x);
+			player_speed.x += ds;
+		}
+	}
+	else
+	{
+		player_speed.x = copysignf(player_speed_max, dx);
+	}
+	//  xxxxxxxxxx>>>>>>>>
+
+	// <<<<<<<<yyyyyyyyy
+	if(fabs(dy) == 0)
+	{
+		if(fabs(player_speed.y) < epsilon_speed)
+		{
+			player_speed.y = 0;
+		}
+		else
+		{
+			float ds = - copysignf(elapsed_seconds * player_brake, player_speed.y);
+			player_speed.y += ds;
+		}
+	}
+	else
+	{
+		player_speed.y = copysignf(player_speed_max, dy);
+	}
+	//  yyyyyyyyyy>>>>>>>>>>><
+
 	Vector2 d = (Vector2)
 	{
-		elapsed_seconds * player_speed * dx,
-		elapsed_seconds * player_speed * dy
+		elapsed_seconds * player_speed.x,
+		elapsed_seconds * player_speed.y
 	};
 
 	iCluige.iNode2D.move_local(player_node2D, d);
@@ -1393,7 +1434,8 @@ int main()
 	new_Script->process = process_Player;
 	new_Script->_sub_class = NULL;
 	player_node->script = new_Script;
-	player_speed = 300;
+	player_speed_max = 300;
+	player_brake = 400;
 
 	min_dist = 15;
 	max_dist = 1000;
@@ -1703,11 +1745,13 @@ int main()
 //	wprintf(L"%ls\n", l);
 
 	int finish = cluige_finish();
+#ifndef IN_OCTOJAM_2024
 	if(NULL != "DEBUG")
 	{
 		printf("\nThe End ! Press ENTER key to quit...\n");
 		getchar();
 	}
+#endif // IN_OCTOJAM_2024
 //	utils_breakpoint_trick(NULL, true);
 	return finish;
 }
