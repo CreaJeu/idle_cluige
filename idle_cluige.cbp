@@ -37,7 +37,6 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-std=c11" />
-			<Add option="-DPDC_WIDE" />
 			<Add directory="../cluige" />
 		</Compiler>
 		<Linker>

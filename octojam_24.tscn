@@ -12,7 +12,6 @@ position = Vector2(300, 195)
 scale = Vector2(3.8, 3.8)
 texture = ExtResource("1_kwa0e")
 centered = false
-svg_file_path = "loupe.svg"
 script = ExtResource("2_pseyi")
 speed = 300
 
@@ -21,7 +20,6 @@ position = Vector2(448, 211)
 scale = Vector2(0.03, 0.03)
 texture = ExtResource("2_efpur")
 centered = false
-svg_file_path = "question.svg"
 script = ExtResource("3_xwknx")
 
 [node name="mystere_Sprite2D2_12" type="Sprite2D" parent="."]
@@ -29,7 +27,6 @@ position = Vector2(338, 238)
 scale = Vector2(0.03, 0.03)
 texture = ExtResource("2_efpur")
 centered = false
-svg_file_path = "question.svg"
 script = ExtResource("3_xwknx")
 
 [node name="mystere_Sprite2D2_6" type="Sprite2D" parent="."]
@@ -37,7 +34,6 @@ position = Vector2(412, 96)
 scale = Vector2(0.03, 0.03)
 texture = ExtResource("2_efpur")
 centered = false
-svg_file_path = "question.svg"
 script = ExtResource("3_xwknx")
 
 [node name="mystere_Sprite2D2_5" type="Sprite2D" parent="."]
@@ -45,7 +41,6 @@ position = Vector2(71, 209)
 scale = Vector2(0.03, 0.03)
 texture = ExtResource("2_efpur")
 centered = false
-svg_file_path = "question.svg"
 script = ExtResource("3_xwknx")
 
 [node name="mystere_Sprite2D2_4" type="Sprite2D" parent="."]
@@ -53,7 +48,6 @@ position = Vector2(110, 327)
 scale = Vector2(0.03, 0.03)
 texture = ExtResource("2_efpur")
 centered = false
-svg_file_path = "question.svg"
 script = ExtResource("3_xwknx")
 
 [node name="mystere_Sprite2D2_3" type="Sprite2D" parent="."]
@@ -61,7 +55,6 @@ position = Vector2(496, 315)
 scale = Vector2(0.03, 0.03)
 texture = ExtResource("2_efpur")
 centered = false
-svg_file_path = "question.svg"
 script = ExtResource("3_xwknx")
 
 [node name="mystere_Sprite2D2_2" type="Sprite2D" parent="."]
@@ -69,7 +62,6 @@ position = Vector2(119, 63)
 scale = Vector2(0.03, 0.03)
 texture = ExtResource("2_efpur")
 centered = false
-svg_file_path = "question.svg"
 script = ExtResource("3_xwknx")
 
 [node name="mystere_Sprite2D2_7" type="Sprite2D" parent="."]
@@ -77,7 +69,6 @@ position = Vector2(506, 76)
 scale = Vector2(0.03, 0.03)
 texture = ExtResource("2_efpur")
 centered = false
-svg_file_path = "question.svg"
 script = ExtResource("3_xwknx")
 
 [node name="mystere_Sprite2D2_8" type="Sprite2D" parent="."]
@@ -85,7 +76,6 @@ position = Vector2(310, 61)
 scale = Vector2(0.03, 0.03)
 texture = ExtResource("2_efpur")
 centered = false
-svg_file_path = "question.svg"
 script = ExtResource("3_xwknx")
 
 [node name="mystere_Sprite2D2_9" type="Sprite2D" parent="."]
@@ -93,7 +83,6 @@ position = Vector2(221, 205)
 scale = Vector2(0.03, 0.03)
 texture = ExtResource("2_efpur")
 centered = false
-svg_file_path = "question.svg"
 script = ExtResource("3_xwknx")
 
 [node name="mystere_Sprite2D2_10" type="Sprite2D" parent="."]
@@ -101,7 +90,6 @@ position = Vector2(339, 348)
 scale = Vector2(0.03, 0.03)
 texture = ExtResource("2_efpur")
 centered = false
-svg_file_path = "question.svg"
 script = ExtResource("3_xwknx")
 
 [node name="mystere_Sprite2D2_11" type="Sprite2D" parent="."]
@@ -109,5 +97,4 @@ position = Vector2(139, 168)
 scale = Vector2(0.03, 0.03)
 texture = ExtResource("2_efpur")
 centered = false
-svg_file_path = "question.svg"
 script = ExtResource("3_xwknx")
