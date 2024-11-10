@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://br0ysg5vf5xrh"]
-
-[node name="un prefab Node2D" type="Node2D"]
-position = Vector2(10, 0)
-metadata/offset_metadata = Vector2(0, 0)
-metadata/text_metadata = ""
